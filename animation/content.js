@@ -30,7 +30,7 @@ window.PT_CONTENT = {
     },
     {
       title: "What's different",
-      body: "One physical trigger. Ask aloud, hear the answer."
+      body: "One physical trigger. Ask aloud, hear the answer. Runs locally on the laptop."
     }
   ],
 
@@ -46,13 +46,16 @@ window.PT_CONTENT = {
     { label: "What's included", value: "Button · cable · app" }
   ],
   // Small note under the cost card. Leave "" to hide.
-  costNote: "Unverified estimates and a proposed price for a USB trigger. The buyer uses their own laptop.",
+  costNote: "Unverified estimates and a proposed price for the Wristy USB trigger, not the future wristband. The buyer uses their own laptop.",
   // Marketing plan — approved by Michel (confirmed: true hides the DRAFT tag).
   marketing: [
     { text: "Live demos at school events", confirmed: true },
     { text: "Short demo clips on social media", confirmed: true },
     { text: "A student feedback pilot", confirmed: true }
   ],
+
+  // Proposed sales channels (how customers buy it)
+  sales: ["Online orders via a website", "School fairs, where permitted"],
 
   // Overlay badges
   demoBadge: "Working laptop-connected prototype",

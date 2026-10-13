@@ -111,9 +111,9 @@
   .field-row .v { min-width: 270px; height: 66px; border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 0 24px; font: 700 32px/1 var(--display); }
   .v.filled { background: var(--green); color: var(--cream); }
   .v.empty { border: 3px dashed var(--brass); color: var(--brass); font: 700 22px/1 var(--text); letter-spacing: .14em; background: rgba(195,143,58,.07); }
-  .mk { display: flex; align-items: flex-start; gap: 22px; margin-bottom: 26px; }
+  .mk { display: flex; align-items: flex-start; gap: 22px; margin-bottom: 16px; }
   .mk .dot { flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--brass); margin-top: 12px; }
-  .mk .tx { font: 500 33px/1.32 var(--text); color: var(--cream); }
+  .mk .tx { font: 500 31px/1.3 var(--text); color: var(--cream); }
   .draft { display: block; width: fit-content; margin-top: 10px; padding: 7px 12px; border-radius: 6px; border: 2px dashed var(--brass-soft); color: var(--brass-soft); font: 700 19px/1 var(--text); letter-spacing: .12em; }
 
   /* Badges / lower third */
@@ -695,16 +695,20 @@ scenes.cost = {
   dur: 7, bg: "bg-cream",
   html: () => `
     <div class="abs eyebrow" data-k="eb" style="left:120px;top:110px">The business</div>
-    <div class="abs h1" data-k="h" style="left:120px;top:150px">Cost, price &amp; marketing <span style="font:700 26px/1 var(--text);letter-spacing:.12em;color:#9C6E22;border:3px dashed var(--brass);border-radius:12px;padding:10px 16px;vertical-align:14px;margin-left:18px">DRAFT ESTIMATES</span></div>
+    <div class="abs h1" data-k="h" style="left:120px;top:150px">Cost, price, marketing &amp; sales <span style="font:700 26px/1 var(--text);letter-spacing:.12em;color:#9C6E22;border:3px dashed var(--brass);border-radius:12px;padding:10px 16px;vertical-align:14px;margin-left:18px">DRAFT ESTIMATES</span></div>
     <div class="abs card" data-k="c1" style="left:120px;top:300px;width:960px;height:500px;background:#FBF7EE;border:2px solid var(--cream-2);box-shadow:0 18px 50px rgba(24,58,43,.08);padding:36px 50px">
       ${C.cost.map(f => `<div class="field-row" data-k="row"><div class="l">${esc(f.label)}</div>
         <div class="v ${f.value ? "filled" : "empty"}">${f.value ? esc(f.value) : "TO CONFIRM"}</div></div>`).join("")}
     </div>
     ${C.costNote ? `<div class="abs" data-k="note" style="left:120px;top:836px;width:1680px;font:600 30px/1.35 var(--text);color:var(--green-2)">${esc(C.costNote)}</div>` : ""}
-    <div class="abs card" data-k="c2" style="left:1120px;top:300px;width:680px;height:500px;background:var(--green);box-shadow:0 18px 50px rgba(24,58,43,.22);padding:50px 54px">
+    <div class="abs card" data-k="c2" style="left:1120px;top:300px;width:680px;height:500px;background:var(--green);box-shadow:0 18px 50px rgba(24,58,43,.22);padding:38px 50px">
       <div class="eyebrow" style="color:var(--brass-soft)">Marketing plan</div>
-      <div style="margin-top:40px">
+      <div style="margin-top:22px">
         ${C.marketing.map(m => `<div class="mk" data-k="mk"><div class="dot"></div><div class="tx">${esc(m.text)}${m.confirmed ? "" : `<span class="draft">DRAFT</span>`}</div></div>`).join("")}
+      </div>
+      <div class="eyebrow" data-k="mk" style="color:var(--brass-soft);margin-top:30px">Proposed sales channels</div>
+      <div style="margin-top:22px">
+        ${(C.sales || []).map(t => `<div class="mk" data-k="mk"><div class="dot" style="background:var(--sage)"></div><div class="tx">${esc(t)}</div></div>`).join("")}
       </div>
     </div>
   `,
@@ -722,7 +726,7 @@ scenes.cost = {
       const kv = p(t, 1.25 + i * .16, .6, E.outBack);
       S(v, { op: kv, s: lerp(.8, 1, kv) });
     });
-    qa(r, "mk").forEach((el, i) => enter(el, t, 1.35 + i * .18, { d: .7, dist: 24, blur: 4 }));
+    qa(r, "mk").forEach((el, i) => enter(el, t, 1.3 + i * .14, { d: .7, dist: 24, blur: 4 }));
     enter(q(r, "note"), t, 1.9, { out, dist: 16 });
   }
 };
@@ -849,13 +853,15 @@ scenes["frame-b"] = {
   html: () => `${holeBg(EDL.winPresenter, "url(#fbb-bg)", "#FBF7EE", "fbb")}
     <div class="abs eyebrow" data-k="eb" style="left:800px;top:200px">Marketing plan</div>
     <div class="abs" data-k="h" style="left:800px;top:244px;font:700 70px/1.05 var(--display);letter-spacing:-.02em">How I'll reach people</div>
-    ${EDL.presenterB.items.map((it, i) => `<div class="abs" data-k="it" style="left:800px;top:${400 + i * 120}px;display:flex;align-items:center;gap:26px">
+    ${EDL.presenterB.items.map((it, i) => `<div class="abs" data-k="it" style="left:800px;top:${380 + i * 108}px;display:flex;align-items:center;gap:26px">
       <span style="width:64px;height:64px;border-radius:50%;background:var(--brass);color:var(--green-deep);display:flex;align-items:center;justify-content:center;font:700 32px/1 var(--display)">${i + 1}</span>
       <span style="font:600 46px/1.1 var(--text)">${esc(it[1])}</span></div>`).join("")}
-    <div class="abs" data-k="ty" style="left:800px;top:800px;padding:26px 40px;border-radius:24px;background:var(--green);color:var(--cream);font:700 52px/1 var(--display)">Thank you for watching!</div>`,
+    <div class="abs" data-k="sl" style="left:800px;top:720px;width:1000px;font:500 34px/1.3 var(--text);color:var(--muted)"><b style="color:var(--green)">Proposed sales:</b> ${esc((C.sales || []).join(" · "))}</div>
+    <div class="abs" data-k="ty" style="left:800px;top:850px;padding:26px 40px;border-radius:24px;background:var(--green);color:var(--cream);font:700 52px/1 var(--display)">Thank you for watching!</div>`,
   update(r, t) {
     enter(q(r, "eb"), t, .1); enter(q(r, "h"), t, .2, { dist: 44 });
     qa(r, "it").forEach((el, i) => enter(el, t, EDL.presenterB.items[i][0] - .15, { d: .6, dist: 26 }));
+    enter(q(r, "sl"), t, 6.1, { d: .6, dist: 20 });
     enter(q(r, "ty"), t, EDL.presenterB.thanks - .1, { d: .6, dist: 26, sFrom: .96 });
   }
 };

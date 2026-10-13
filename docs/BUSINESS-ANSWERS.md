@@ -50,6 +50,10 @@ Wristy trigger button · USB-C cable · free Wristy laptop app (local speech rec
 2. **Short demo clips on social media**, e.g. Instagram, TikTok or YouTube Shorts, showing one question and one answer.
 3. **A feedback pilot with student testers**: lend 10–20 units, collect feedback and improve before selling more.
 
+## 7b. Proposed sales channels (how customers buy it)
+1. **Online orders via a simple website**: order the Wristy USB trigger, then download the free laptop app.
+2. **School fairs, where permitted**: sell in person after a live demo.
+
 ## 8. Next steps (be upfront about these)
 Proper enclosure and switch, then a smaller wristband version. That needs its own power system and smaller hardware, and is still at the concept stage.
 
