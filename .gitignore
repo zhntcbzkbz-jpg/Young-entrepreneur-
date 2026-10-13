@@ -2,3 +2,4 @@ node_modules/
 dist/
 renders/frames/
 edit/work/
+__pycache__/
