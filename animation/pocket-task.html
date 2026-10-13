@@ -47,6 +47,8 @@
   html.transparent .scene { background: transparent !important; }
 
   .scene { position: absolute; inset: 0; display: none; overflow: hidden; }
+  .ambient { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .ambient i { position: absolute; width: 1300px; height: 1300px; margin: -650px 0 0 -650px; border-radius: 50%; will-change: transform; }
   .scene.active { display: block; }
   .abs { position: absolute; will-change: transform, opacity; }
   .bg-cream { background: radial-gradient(ellipse 120% 90% at 50% 40%, #F8F3E8 0%, var(--cream) 55%, #ECE4D3 100%); }
@@ -73,7 +75,7 @@
     left: 50%; top: 908px; height: 100px; transform: translateX(-50%);
     display: flex; align-items: center; gap: 24px; padding: 0 44px 0 22px;
     background: var(--green); color: var(--cream); border-radius: 50px; white-space: nowrap;
-    font: 600 40px/1 var(--text); box-shadow: 0 14px 40px rgba(16,42,31,.18);
+    font: 600 40px/1 var(--text); box-shadow: 0 14px 40px rgba(16,42,31,.18), 0 0 46px rgba(195,143,58,.22);
   }
   .caption .n {
     width: 62px; height: 62px; border-radius: 50%; background: var(--brass); color: var(--green-deep);
@@ -228,6 +230,7 @@ scenes.title = {
       <circle data-k="ring" cx="960" cy="360" r="120" fill="none" stroke="#2C5E45" stroke-width="3"/>
       <circle data-k="ring" cx="960" cy="360" r="120" fill="none" stroke="#2C5E45" stroke-width="3"/>
     </svg>
+    <div class="abs" data-k="mglow" style="left:710px;top:110px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle, rgba(222,178,96,.55) 0%, rgba(222,178,96,.18) 35%, transparent 68%)"></div>
     <div class="abs" data-k="mark" style="left:870px;top:270px;width:180px;height:180px">${markSVG(180, "#183A2B", "#F4EEE1", "#C38F3A")}</div>
     <div class="abs center-x wordmark" data-k="word" style="top:500px">${[...C.projectName].map(ch => `<span>${ch === " " ? "&nbsp;" : esc(ch)}</span>`).join("")}</div>
     <div class="abs center-x" data-k="tag" style="top:676px;font:500 44px/1 var(--text);color:var(--green-2)">${esc(C.tagline)}</div>
@@ -242,6 +245,8 @@ scenes.title = {
     const km = p(t, .1, .75, E.outBack);
     const press = Math.sin(Math.PI * clamp((t - 1.0) / .28)) * .08;
     S(q(r, "mark"), { op: p(t, .1, .35) * (1 - ko), s: (.55 + .45 * km) * (1 - press) * (1 - .06 * ko), y: -14 * ko });
+    const pulse = Math.sin(Math.PI * clamp((t - .95) / .9));
+    S(q(r, "mglow"), { op: p(t, .2, .8) * (.45 + .55 * pulse) * (1 - ko), s: .85 + .25 * pulse });
     // rings radiate after the press
     qa(r, "ring").forEach((el, i) => {
       const k = clamp((t - 1.05 - i * .22) / 1.6);
@@ -283,7 +288,7 @@ scenes.why = {
     ${C.why.map((c, i) => `
       <div class="abs card" data-k="card" style="left:${150 + i * 556}px;top:350px;width:516px;height:440px;
         background:${i === 2 ? "var(--green)" : "#FBF7EE"};color:${i === 2 ? "var(--cream)" : "var(--green)"};
-        box-shadow:0 18px 50px rgba(24,58,43,${i === 2 ? .22 : .08});${i === 2 ? "" : "border:2px solid var(--cream-2);"}">
+        box-shadow:0 18px 50px rgba(24,58,43,${i === 2 ? .22 : .08})${i === 2 ? ", 0 0 70px rgba(195,143,58,.20)" : ""};${i === 2 ? "" : "border:2px solid var(--cream-2);"}">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div class="num" style="${i === 2 ? "color:var(--brass-soft)" : ""}">0${i + 1}</div>
           <div data-k="ico" style="width:76px;height:76px;border-radius:22px;${i === 2 ? "background:var(--cream);" : ""}display:flex;align-items:center;justify-content:center">${whyIcons[i]}</div>
@@ -640,6 +645,8 @@ scenes.future = {
     <svg class="abs" style="left:0;top:0" width="${W}" height="${H}">
       <defs>${bandDefs("fb")}</defs>
       <g data-k="cam"><g filter="url(#fb-drop)">${bandMarkup("fb")}</g>
+        <radialGradient id="fb-glow"><stop offset="0" stop-color="#E9C27A" stop-opacity=".9"/><stop offset=".45" stop-color="#E9C27A" stop-opacity=".3"/><stop offset="1" stop-color="#E9C27A" stop-opacity="0"/></radialGradient>
+        <circle data-k="bglow" r="170" fill="url(#fb-glow)"/>
         <g data-k="rings">${[0, 1].map(() => `<circle data-k="wring" r="70" fill="none" stroke="#C38F3A" stroke-width="5"/>`).join("")}</g>
       </g>
     </svg>
@@ -669,6 +676,9 @@ scenes.future = {
     const cam = q(r, "cam");
     cam.setAttribute("transform", `translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${k.toFixed(4)})`);
     cam.style.opacity = p(t, 0, .55).toFixed(3);
+    const bg = q(r, "bglow");
+    bg.setAttribute("transform", `translate(${(BAND.BH * Math.sin(theta * Math.PI / 180)).toFixed(2)} 0) scale(${Math.cos(theta * Math.PI / 180).toFixed(4)} 1)`);
+    bg.style.opacity = (p(t, 1.2, 1.0) * (.22 + .6 * press)).toFixed(3);
     // press rings (in band space, follow the rotation)
     const c = Math.cos(theta * Math.PI / 180);
     qa(r, "wring").forEach((el, i) => {
@@ -738,6 +748,7 @@ scenes.closing = {
     <svg class="abs" style="left:0;top:0" width="${W}" height="${H}">
       ${[0,1,2].map(() => `<circle data-k="ring" cx="960" cy="330" r="90" fill="none" stroke="#C38F3A" stroke-width="3"/>`).join("")}
     </svg>
+    <div class="abs" data-k="mglow" style="left:735px;top:105px;width:450px;height:450px;border-radius:50%;background:radial-gradient(circle, rgba(222,178,96,.55) 0%, rgba(222,178,96,.18) 35%, transparent 68%)"></div>
     <div class="abs" data-k="mark" style="left:880px;top:250px;width:160px;height:160px">${markSVG(160, "#F4EEE1", "#183A2B", "#C38F3A")}</div>
     <div class="abs center-x wordmark" data-k="word" style="top:470px;font-size:132px;color:var(--cream)">${esc(C.projectName)}</div>
     <div class="abs center-x" data-k="tag" style="top:630px;font:500 42px/1 var(--text);color:var(--brass-soft)">${esc(C.tagline)}</div>
@@ -752,6 +763,8 @@ scenes.closing = {
       el.setAttribute("r", (80 + 200 * e).toFixed(2));
       el.style.opacity = (k <= 0 || k >= 1 ? 0 : (1 - e) * .6).toFixed(3);
     });
+    const pg = Math.sin(Math.PI * clamp((t - .9) / 1.0));
+    S(q(r, "mglow"), { op: p(t, .2, .8) * (.5 + .5 * pg), s: .85 + .25 * pg });
     const kw = p(t, .45, 1.0, E.outQuart);
     S(q(r, "word"), { op: kw, y: 50 * (1 - kw), b: 10 * (1 - kw), s: lerp(.97, 1, kw) });
     enter(q(r, "tag"), t, .85);
@@ -821,7 +834,7 @@ function holeBg(win, fill, rim, id) {
 const presenterDur = c => +(c.out - c.in).toFixed(3);
 
 scenes["frame-a"] = {
-  dur: presenterDur(EDL.presenterA), transparent: true,
+  dur: presenterDur(EDL.presenterA), transparent: true, ambient: { kind: "cream", win: EDL.winPresenter },
   html: () => {
     const w = EDL.winPresenter;
     return `${holeBg(w, "url(#fa-bg)", "#FBF7EE", "fa")}
@@ -849,7 +862,7 @@ scenes["frame-a"] = {
 };
 
 scenes["frame-b"] = {
-  dur: presenterDur(EDL.presenterB), transparent: true,
+  dur: presenterDur(EDL.presenterB), transparent: true, ambient: { kind: "cream", win: EDL.winPresenterB },
   html: () => {
     const w = EDL.winPresenterB, cx = w.x + w.w / 2;
     const pill = (i, it) => {
@@ -888,7 +901,7 @@ scenes["frame-b"] = {
 
 const demoTimes = (() => { let a = 0; return EDL.demo.map(s => { const o = { a, d: s.out - s.in }; a += o.d; return o; }); })();
 scenes["frame-demo"] = {
-  dur: +demoTimes.reduce((s, x) => s + x.d, 0).toFixed(3), transparent: true,
+  dur: +demoTimes.reduce((s, x) => s + x.d, 0).toFixed(3), transparent: true, ambient: { kind: "green", win: EDL.winDemo },
   html: () => {
     const w = EDL.winDemo;
     const small = (k, txt, icon) => `<div class="abs" data-k="${k}" style="left:${w.x + 24}px;top:${w.y + 24}px;display:flex;align-items:center;gap:12px;padding:12px 20px;border-radius:16px;background:rgba(195,143,58,.96);color:var(--green-deep);font:700 26px/1 var(--text);box-shadow:0 8px 22px rgba(0,0,0,.3)">${icon}${esc(txt)}</div>`;
@@ -943,6 +956,24 @@ function slotScene(item) {
 }
 (window.PT_TIMELINE || []).forEach(it => { if (it.type === "slot") scenes[it.id] = slotScene(it); });
 
+/* ---------- ambient light: soft gradient glows that drift slowly ---------- */
+const AMB = {
+  cream: [["rgba(222,178,96,.20)", 300, 180, .21, 0], ["rgba(143,174,147,.24)", 1650, 900, .17, 2], ["rgba(255,252,244,.75)", 980, 420, .13, 4]],
+  green: [["rgba(64,130,100,.42)", 420, 220, .19, 1], ["rgba(195,143,58,.13)", 1600, 860, .16, 3], ["rgba(47,102,80,.38)", 1100, 600, .12, 5]]
+};
+function ambientHTML(kind, win) {
+  const clip = win ? `clip-path:path(evenodd, 'M0 0 H${W} V${H} H0 Z ${rrPath(win)}');` : "";
+  return `<div class="ambient" data-amb="${kind}" style="${clip}">${AMB[kind].map(([c]) =>
+    `<i style="background:radial-gradient(circle, ${c} 0%, transparent 62%)"></i>`).join("")}</div>`;
+}
+function animateAmbient(root, t) {
+  const a = root.querySelector(".ambient"); if (!a) return;
+  [...a.children].forEach((el, i) => {
+    const [, x, y, sp, ph] = AMB[a.dataset.amb][i];
+    el.style.transform = `translate(${(x + 140 * Math.sin(t * sp + ph)).toFixed(1)}px,${(y + 90 * Math.cos(t * sp * 1.3 + ph)).toFixed(1)}px) scale(${(1 + .08 * Math.sin(t * sp * .7 + ph)).toFixed(3)})`;
+  });
+}
+
 /* ================= ENGINE ================= */
 const stage = document.getElementById("stage");
 const roots = {};
@@ -951,6 +982,8 @@ for (const [id, sc] of Object.entries(scenes)) {
   const el = document.createElement("div");
   el.className = `scene ${sc.bg || ""} ${sc.cls || ""}`;
   el.innerHTML = sc.html();
+  if (sc.bg) el.insertAdjacentHTML("afterbegin", ambientHTML(sc.bg === "bg-green" ? "green" : "cream"));
+  if (sc.ambient) el.firstElementChild.insertAdjacentHTML("afterend", ambientHTML(sc.ambient.kind, sc.ambient.win));
   el.dataset.scene = id;
   stage.appendChild(el);
   roots[id] = el;
@@ -964,6 +997,7 @@ function render(id, t) {
   show(id);
   document.documentElement.classList.toggle("transparent", !!scenes[id].transparent);
   scenes[id].update(roots[id], clamp(t, 0, scenes[id].dur));
+  animateAmbient(roots[id], clamp(t, 0, scenes[id].dur));
 }
 const timeline = (window.PT_TIMELINE || []).filter(it => scenes[it.id]);
 const totalDur = timeline.reduce((s, it) => s + it.dur, 0);

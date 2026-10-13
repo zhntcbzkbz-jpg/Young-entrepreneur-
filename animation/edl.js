@@ -44,11 +44,29 @@ window.PT_EDL = {
   ],
   answer: "“A prototype is an early version of a product or idea that allows you to test its functionality before it becomes the final version.”",
 
+  // Sound effects per part: [time within the part, sound, gain]. Sounds are synthesised in edit/sound.py.
+  sfx: {
+    title: [[0.08, "chime", 1], [0.5, "whoosh", .7], [0.98, "click", .9], [1.05, "shimmer", 1], [1.3, "tick", .8], [1.95, "tick", .7], [4.4, "whoosh_out", .8]],
+    presenterA: [[0.2, "pop", .7], [0.6, "tick", .6]],
+    why: [[0.1, "whoosh", .8], [0.55, "pop", .8], [0.75, "pop", .75], [0.95, "pop", .8], [5.35, "whoosh_out", .7]],
+    pipeline: [[0.1, "whoosh", .7], [0.35, "swell", .8], [0.9, "pop", .6], [1.95, "tick", .6], [2.75, "click", .8], [2.85, "blip", .9],
+      [3.7, "tick", .5], [3.75, "whoosh_short", .8], [4.9, "tick", .5], [6.2, "tick", .5],
+      [6.45, "type", 1], [6.6, "type", .9], [6.76, "type", 1], [6.9, "type", .9], [7.05, "type", 1], [7.3, "click", .7],
+      [7.55, "tick", .5], [8.45, "chime_small", .8], [9.6, "tick", .5], [11.4, "whoosh_out", .7]],
+    future: [[0.05, "swell", 1], [2.3, "whoosh", .8], [3.75, "pop", .7], [4.0, "tick", .6], [4.2, "tick", .6],
+      [4.58, "click", .9], [4.65, "shimmer", 1], [5.2, "whoosh", .9], [5.5, "pop", .8]],
+    demo: [[4.75, "tick", .6], [12.8, "tick", .6], [12.85, "pop", .6], [14.7, "tick", .6], [21.9, "tick", .6], [21.95, "pop", .6]],
+    cost: [[0.15, "whoosh", .8], [0.45, "pop", .7], [0.65, "pop", .7], [0.95, "tick", .5], [1.11, "tick", .5], [1.27, "tick", .5],
+      [1.43, "tick", .5], [1.3, "pop", .5], [1.86, "pop", .5], [6.45, "whoosh_out", .7]],
+    presenterB: [[0.2, "whoosh", .6], [2.1, "pop", .9], [3.95, "pop", .9], [5.25, "pop", .9], [6.1, "tick", .6], [6.8, "chime_small", .9]],
+    closing: [[0.05, "chime", 1.1], [0.95, "click", .8], [1.0, "shimmer", 1]]
+  },
+
   // Voice-overs placed under the animation scenes: [file, in, out, startInScene] (+ optional second piece)
   vo: {
     why: [["Euljiro1-ga", 2.25, 6.5, 0.8]],
     pipeline: [["Euljiro1-ga_3", 1.05, 12.25, 0.45]],
-    future: [["Euljiro1-ga_6", 0.0, 5.25, 0.3]],
-    cost: [["Euljiro1-ga_8", 0.0, 4.5, 0.45], ["Euljiro1-ga_8", 5.2, 6.55, 5.25]]
+    future: [["Euljiro1-ga_6", 0.0, 5.25, 0.5]],
+    cost: [["Euljiro1-ga_8", 0.0, 4.5, 0.55], ["Euljiro1-ga_8", 5.2, 6.55, 5.3]]
   }
 };

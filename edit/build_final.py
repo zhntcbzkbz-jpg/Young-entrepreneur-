@@ -43,17 +43,23 @@ def find(footage, name):
     return hits[0]
 
 
+# voice clean-up: rumble cut, light denoise, less boxiness, more clarity, de-ess, gentle compression
+VOICE = ("highpass=f=85,afftdn=nf=-30:nr=10,equalizer=f=250:t=q:w=1:g=-2.5,"
+         "equalizer=f=3300:t=q:w=1.2:g=2.5,equalizer=f=9000:t=h:w=2000:g=1.5,deesser=i=0.4,"
+         "acompressor=threshold=-22dB:ratio=3:attack=6:release=90:makeup=2")
+
+
 def gain_db(src, a, b):
-    """Gain that brings this speech piece to LUFS (measured with loudnorm)."""
+    """Gain that brings this cleaned speech piece to LUFS (measured with loudnorm)."""
     r = run(["ffmpeg", "-hide_banner", "-ss", f"{a}", "-to", f"{b}", "-i", src, "-vn",
-             "-af", "loudnorm=print_format=json", "-f", "null", "-"])
+             "-af", VOICE + ",loudnorm=print_format=json", "-f", "null", "-"])
     txt = r.stderr[r.stderr.rindex("{"):]
     return LUFS - float(json.loads(txt)["input_i"])
 
 
 def speech_chain(label_in, g, dur, label_out):
     # level, gentle high-pass, short fades (no clicks), limiter, fixed format
-    return (f"[{label_in}]highpass=f=80,volume={g:.2f}dB,afade=t=in:d=0.03,"
+    return (f"[{label_in}]{VOICE},volume={g:.2f}dB,afade=t=in:d=0.03,"
             f"afade=t=out:st={max(dur - 0.05, 0):.3f}:d=0.05,alimiter=limit=0.84,"
             f"aresample={AR},aformat=sample_fmts=fltp:channel_layouts=stereo[{label_out}]")
 
@@ -86,7 +92,7 @@ def presenter(seg, frame, footage, win, out):
     dur = b - a
     g = gain_db(src, a, b)
     fc = (f"color=c=0x102A1F:s=1920x1080:r={FPS}:d={dur}[bg];"
-          f"[0:v]scale={win['w']}:{win['h']}:flags=lanczos,setsar=1,fps={FPS}[v];"
+          f"[0:v]scale={win['w']}:{win['h']}:flags=lanczos,setsar=1,fps={FPS},eq=contrast=1.05:saturation=1.08:gamma=0.98,unsharp=5:5:0.35[v];"
           f"[bg][v]overlay={win['x']}:{win['y']}:shortest=1[b];[b][1:v]overlay=0:0:shortest=1[vo];"
           + speech_chain("0:a", g, dur, "ao"))
     run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-ss", f"{a}", "-to", f"{b}", "-i", src,
@@ -108,7 +114,7 @@ def demo(edl, footage, out):
         cmd += ["-ss", f"{a}", "-to", f"{b}", "-i", src]
         g = gain_db(src, a, b)
         fc.append(f"[{i}:v]scale=1080:1920:flags=lanczos,setsar=1,crop=1080:{ch}:0:{cy},"
-                  f"scale={win['w']}:{win['h']}:flags=lanczos,fps={FPS},trim=0:{d:.3f},setpts=PTS-STARTPTS[v{i}]")
+                  f"scale={win['w']}:{win['h']}:flags=lanczos,fps={FPS},eq=contrast=1.05:saturation=1.08:gamma=0.98,unsharp=5:5:0.35,trim=0:{d:.3f},setpts=PTS-STARTPTS[v{i}]")
         fc.append(speech_chain(f"{i}:a", g, d, f"a{i}") + f";[a{i}]atrim=0:{d:.3f},asetpts=PTS-STARTPTS[b{i}]")
         cat += f"[v{i}][b{i}]"
     n = len(edl["demo"])
@@ -155,12 +161,43 @@ def main():
         d = float(probe(out)["format"]["duration"])
         print(f"part {tag}: {d:6.2f} s")
         files.append(out)
-    lst = W("list.txt")
-    with open(lst, "w") as f:
-        f.writelines(f"file '{p}'\n" for p in files)
+    # smooth dissolves between sections (the wristband → demo hand-off stays a clean cut)
+    trans = [0.25, 0.4, 0.4, 0.4, 0.034, 0.4, 0.25, 0.5]
+    durs = [float(probe(p)["format"]["duration"]) for p in files]
+    starts, acc = [0.0], durs[0]
+    fc, vlab, alab = [], "0:v", "0:a"
+    for i in range(1, len(files)):
+        d = trans[i - 1]
+        off = acc - d
+        starts.append(off)
+        fc.append(f"[{vlab}][{i}:v]xfade=transition=fade:duration={d}:offset={off:.3f}[vx{i}]")
+        fc.append(f"[{alab}][{i}:a]acrossfade=d={d}:c1=tri:c2=tri[ax{i}]")
+        vlab, alab = f"vx{i}", f"ax{i}"
+        acc = off + durs[i]
     master = W("master.mp4")
-    run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", master])
+    cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error"]
+    for p in files:
+        cmd += ["-i", p]
+    cmd += ["-filter_complex", ";".join(fc), "-map", f"[{vlab}]", "-map", f"[{alab}]", *ENC_V, *ENC_A, master]
+    run(cmd)
     dur = float(probe(master)["format"]["duration"])
+
+    # sound effects on the animation moments + quiet music bed that ducks under speech
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import sound
+    keys = ["title", "presenterA", "why", "pipeline", "future", "demo", "cost", "presenterB", "closing"]
+    cues = [(starts[i] + t, name, g) for i, k in enumerate(keys) for t, name, g in edl.get("sfx", {}).get(k, [])]
+    sfx_wav, mus_wav = W("sfx.wav"), W("music.wav")
+    sound.write_wav(sfx_wav, sound.sfx_track(cues, dur))
+    sound.write_wav(mus_wav, sound.music_bed(dur), peak=0.5)
+    mixed = W("mixed.mp4")
+    afc = ("[0:a]asplit=2[voice][sc];"
+           "[2:a]volume=-15dB[mus];[mus][sc]sidechaincompress=threshold=0.015:ratio=10:attack=15:release=450:makeup=1[duck];"
+           "[1:a]volume=-3dB[fx];"
+           "[voice][fx][duck]amix=inputs=3:normalize=0:duration=first,alimiter=limit=0.79:level=false[aout]")
+    run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", master, "-i", sfx_wav, "-i", mus_wav,
+         "-filter_complex", afc, "-map", "0:v", "-map", "[aout]", "-c:v", "copy", *ENC_A, mixed])
+    master = mixed
 
     # final: two-pass H.264 sized to TARGET_BYTES, AAC 128k
     vk = int((TARGET_BYTES * 8 / dur - 128_000) / 1000)
