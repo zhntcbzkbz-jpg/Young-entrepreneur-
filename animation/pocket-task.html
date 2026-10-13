@@ -636,8 +636,9 @@ scenes.cost = {
       ${C.cost.map(f => `<div class="field-row" data-k="row"><div class="l">${esc(f.label)}</div>
         <div class="v ${f.value ? "filled" : "empty"}">${f.value ? esc(f.value) : "TO CONFIRM"}</div></div>`).join("")}
     </div>
+    ${C.costNote ? `<div class="abs" data-k="note" style="left:120px;top:836px;width:1680px;font:400 26px/1.35 var(--text);color:var(--muted)">${esc(C.costNote)}</div>` : ""}
     <div class="abs card" data-k="c2" style="left:1120px;top:300px;width:680px;height:500px;background:var(--green);box-shadow:0 18px 50px rgba(24,58,43,.22);padding:50px 54px">
-      <div class="eyebrow" style="color:var(--brass-soft)">How we'll reach people</div>
+      <div class="eyebrow" style="color:var(--brass-soft)">How I'll reach people</div>
       <div style="margin-top:40px">
         ${C.marketing.map(m => `<div class="mk" data-k="mk"><div class="dot"></div><div class="tx">${esc(m.text)}${m.confirmed ? "" : `<span class="draft">DRAFT</span>`}</div></div>`).join("")}
       </div>
@@ -658,6 +659,7 @@ scenes.cost = {
       S(v, { op: kv, s: lerp(.8, 1, kv) });
     });
     qa(r, "mk").forEach((el, i) => enter(el, t, 1.35 + i * .18, { d: .7, dist: 24, blur: 4 }));
+    enter(q(r, "note"), t, 1.9, { out, dist: 16 });
   }
 };
 

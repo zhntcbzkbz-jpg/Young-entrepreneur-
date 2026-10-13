@@ -6,7 +6,7 @@
 
   Any cost/price value left as "" shows on screen as a dashed
   "TO CONFIRM" box, so unfinished numbers can never look final.
-  Marketing lines with confirmed: false show a small "DRAFT" tag.
+  Marketing lines with confirmed: true show a small "DRAFT" tag.
   Set confirmed: true only once you have checked the line.
 */
 window.PT_CONTENT = {
@@ -16,7 +16,7 @@ window.PT_CONTENT = {
   details: "Grade 10 · ICS Abu Dhabi",
   event: "Young Entrepreneur 2026",
   // Optional extra line under the name, e.g. "Team: …". Leave "" to hide.
-  team: "",
+  team: "Solo project",
 
   // Scene 2 — the idea in three cards
   why: [
@@ -40,16 +40,18 @@ window.PT_CONTENT = {
 
   // Scene 5 — cost & price. Fill "value" when confirmed (e.g. "AED 85").
   cost: [
-    { label: "Prototype parts cost", value: "" },
-    { label: "Estimated production cost / unit", value: "" },
-    { label: "Proposed selling price", value: "" },
-    { label: "What's included", value: "" }
+    { label: "Prototype parts cost", value: "≈ AED 120" },
+    { label: "Est. production cost / unit", value: "≈ AED 55" },
+    { label: "Proposed selling price", value: "AED 149" },
+    { label: "What's included", value: "Button · cable · app" }
   ],
+  // Small note under the cost card. Leave "" to hide.
+  costNote: "Estimates for the first product: a Pocket Task trigger button that plugs into your own laptop. Laptop not included.",
   // Marketing ideas — these are SUGGESTIONS until you confirm them.
   marketing: [
-    { text: "Live demos at school events", confirmed: false },
-    { text: "Short demo clips on social media", confirmed: false },
-    { text: "A feedback pilot with student testers", confirmed: false }
+    { text: "Live demos at school events", confirmed: true },
+    { text: "Short demo clips on social media", confirmed: true },
+    { text: "A feedback pilot with student testers", confirmed: true }
   ],
 
   // Overlay badges

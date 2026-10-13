@@ -1,6 +1,6 @@
 # Pocket Task: competition video animation package
 
-Animation and editing assets for Michel Aylabouni's Young Entrepreneur 2026 entry (ICS Abu Dhabi).
+Animation and editing assets for Michel Aylabouni's Young Entrepreneur 2026 entry (ICS Abu Dhabi). Solo project.
 The style is cream and dark green, with clean type, restrained motion and large captions.
 
 ## Ready to use (`renders/`)
@@ -10,7 +10,7 @@ The style is cream and dark green, with clean type, restrained motion and large 
 | `scenes/02-why.mp4` | 6 s | Problem / target users / what's different |
 | `scenes/03-pipeline.mp4` | 12 s | Wires → Arduino (USB) → laptop: whisper.cpp → Qwen3.5 0.8B (local) → speech |
 | `scenes/04-future.mp4` | 6 s | Wristband concept, labelled **FUTURE DESIGN** |
-| `scenes/05-cost.mp4` | 7 s | Cost / price fields (**TO CONFIRM** until you fill them) + marketing (**DRAFT**) |
+| `scenes/05-cost.mp4` | 7 s | Cost (≈ AED 120 prototype, ≈ AED 55 per unit), price AED 149, what's included, marketing |
 | `scenes/06-closing.mp4` | 5 s | Closing card |
 | `overlays/lower-third-alpha.mov` (+ `.png`) | 5 s | Name lower third, transparent |
 | `overlays/badge-real-demo-alpha.mov` (+ `.png`) | 3 s | "Real prototype demo" badge |
@@ -21,6 +21,7 @@ All files are 1920×1080 at 30 fps. The MP4s are H.264. The MOVs are PNG-codec w
 
 ## Guides (`docs/`)
 - **`EDIT-GUIDE.md`**: shot-by-shot timeline, narration, filming tips, step-by-step clip insertion, export settings that keep the file under 30 MB, and a final checklist.
+- **`BUSINESS-ANSWERS.md`**: cost breakdowns, price and margin, target users, differentiation, marketing, and answers to likely judge questions.
 - **`PROJECT-DESCRIPTION.md`**: a 482-character description draft (limit 500) and a shorter alternative.
 
 ## Editing the animation (`animation/`)
@@ -39,13 +40,13 @@ All files are 1920×1080 at 30 fps. The MP4s are H.264. The MOVs are PNG-codec w
    ```
    Output goes to `renders/`. Add `--fps 60` if your camera footage is 60 fps.
 
-If you don't want to install anything: the cost card can also be made by placing text over `05-cost.mp4` in your editor. Just cover every **TO CONFIRM** box.
+If you want different numbers but don't want to install anything, place your own text boxes over the values in `05-cost.mp4` in your editor.
 
 ## Honesty notes built into the assets
 - The laptop is always shown as the host. The Arduino is labelled "controller only".
 - Qwen3.5 0.8B and whisper.cpp are shown as existing tools that run locally, not something built or trained here.
 - The screen content is labelled "Illustrative example". Your real demo footage is the evidence.
 - The wristband is permanently labelled as a concept that isn't built yet. There is no WHOOP branding or integration claim.
-- Unconfirmed numbers and marketing lines can't render as final text.
+- Costs are labelled as estimates. Empty cost fields in `content.js` render as "TO CONFIRM", and marketing lines with `confirmed: false` get a "DRAFT" tag.
 
 Fonts: Inter (SIL Open Font License), bundled in `animation/assets/fonts/`.

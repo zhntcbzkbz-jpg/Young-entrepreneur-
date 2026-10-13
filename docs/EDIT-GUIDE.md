@@ -18,7 +18,7 @@ Nothing in this package fakes the demo or the presenter.
 | 4 | 0:22–0:34 | 12 s | Animation | `renders/scenes/03-pipeline.mp4` | Wires → Arduino → USB → laptop (Whisper → Qwen → speech). Laptop shown as the host |
 | 5 | 0:34–0:54 | 20 s | **[YOU] Real demo** | your clip + `badge-real-demo` overlay | Real wires, real question, transcript on screen, spoken answer |
 | 6 | 0:54–1:00 | 6 s | Animation | `renders/scenes/04-future.mp4` | Wristband concept, permanently labelled **FUTURE DESIGN · concept, not built yet** |
-| 7 | 1:00–1:07 | 7 s | Animation | `renders/scenes/05-cost.mp4` | Cost and price fields (TO CONFIRM until filled) plus marketing ideas |
+| 7 | 1:00–1:07 | 7 s | Animation | `renders/scenes/05-cost.mp4` | ≈ AED 120 parts · ≈ AED 55 per unit · AED 149 price · button, cable and app included, plus the marketing plan |
 | 8 | 1:07–1:15 | 8 s | **[YOU] Presenter B** | your clip | Marketing in one sentence, then thanks |
 | 9 | 1:15–1:20 | 5 s | Animation | `renders/scenes/06-closing.mp4` | Closing card on dark green |
 
@@ -49,11 +49,13 @@ Read it in your own words. The timings line up with the table above.
 **Shot 6 (future, 6 s, voice-over)**
 > "The goal is a smaller, wrist-worn version. That design is still a concept: it needs an enclosure, a proper switch, power and smaller hardware."
 
-**Shot 7 (cost, 7 s, voice-over)** Say only numbers you have confirmed:
-> "Our parts cost [AED ___], we estimate [AED ___] per unit to make, and we plan to sell it for [AED ___]."
+**Shot 7 (cost, 7 s, voice-over)**
+> "The prototype parts cost about 120 dirhams. A production unit should cost about 55, and I plan to sell it for 149, with the button, cable and app included."
+
+(Where these numbers come from: `docs/BUSINESS-ANSWERS.md`.)
 
 **Shot 8 (Presenter B, 8 s)**
-> "We'd start with live demos at school and short clips online, then test it with students. Thank you for watching."
+> "I'll start with live demos at school events and short clips online, then a feedback pilot with student testers. Thank you for watching."
 
 **Shot 9 (closing, no voice, music fades out)**
 
@@ -131,8 +133,7 @@ ffmpeg -i my-edit.mp4 -c:v libx264 -b:v 2500k -maxrate 3000k -bufsize 5000k -pre
 - [ ] Student name and project name visible (title, lower third, closing)
 - [ ] Idea, problem, target users, differentiation (shots 2–3)
 - [ ] Prototype demonstration with real footage (shot 5)
-- [ ] Production cost and selling price: real numbers, **no "TO CONFIRM" boxes left** (shot 7)
-- [ ] Marketing: confirmed, **no "DRAFT" tags left** (shot 7)
+- [ ] Cost and price on screen match what you say (shot 7, see `BUSINESS-ANSWERS.md`)
 - [ ] Future wristband clearly labelled as a concept (shot 6, already built in)
 - [ ] "Wait shortened" badge used if any waiting was cut
 - [ ] No claims of training Qwen, unlimited ability, web access, autonomous actions, battery life or WHOOP integration
