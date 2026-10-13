@@ -26,7 +26,7 @@ window.PT_CONTENT = {
     },
     {
       title: "Who it's for",
-      body: "Students who want a fast answer while learning, and anyone who prefers to just ask."
+      body: "Students, with a built-in student mode for learning, and anyone who prefers to just ask."
     },
     {
       title: "What's different",

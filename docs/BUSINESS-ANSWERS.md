@@ -30,14 +30,14 @@ Assumes a first batch of about 200–500 units.
 
 ## 3. Proposed selling price: AED 149
 - Gross margin: 149 − 55 = **AED 94 per unit (~63 %)**. That covers marketing, delivery, payment fees and returns.
-- Students and parents see it as similar in price to a pair of mid-range earphones.
+- It's priced like a pair of mid-range earphones, aiming to feel affordable for students and parents.
 - The app is included at no extra cost, with no subscription.
 
 ## 4. What's included
-Pocket Task trigger button · USB-C cable · free Pocket Task laptop app (local speech recognition, local AI answers, spoken replies, transcript review, typed-question fallback).
+Pocket Task trigger button · USB-C cable · free Pocket Task laptop app (local speech recognition, local AI answers, spoken replies, student mode for learning, transcript review, typed-question fallback).
 
 ## 5. Target users
-- **Main:** secondary and university students who want quick answers while studying, without opening apps or getting distracted.
+- **Main:** secondary and university students who want quick answers while studying, without opening apps or getting distracted. The app already has a working student mode for learning.
 - **Also:** anyone who prefers to just ask aloud, e.g. people who find typing slow or awkward.
 
 ## 6. What makes it different

@@ -22,7 +22,7 @@ All files are 1920×1080 at 30 fps. The MP4s are H.264. The MOVs are PNG-codec w
 ## Guides (`docs/`)
 - **`EDIT-GUIDE.md`**: shot-by-shot timeline, narration, filming tips, step-by-step clip insertion, export settings that keep the file under 30 MB, and a final checklist.
 - **`BUSINESS-ANSWERS.md`**: cost breakdowns, price and margin, target users, differentiation, marketing, and answers to likely judge questions.
-- **`PROJECT-DESCRIPTION.md`**: a 482-character description draft (limit 500) and a shorter alternative.
+- **`PROJECT-DESCRIPTION.md`**: a 474-character description draft (limit 500) and a shorter alternative.
 
 ## Editing the animation (`animation/`)
 - `content.js`: **all on-screen text**. This is where you fill in costs, prices and marketing lines, and set `confirmed: true`.

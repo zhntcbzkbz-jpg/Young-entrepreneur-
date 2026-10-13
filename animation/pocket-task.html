@@ -366,11 +366,10 @@ scenes.pipeline = {
         <rect data-k="pa" x="244" y="546" width="12" height="24" rx="2" fill="#7D8A84"/>
         <rect data-k="pb" x="244" y="590" width="12" height="24" rx="2" fill="#7D8A84"/>
       </g>
-      <circle data-k="spark-glow" cx="250" cy="580" r="70" fill="url(#glow)"/>
-      <g data-k="spark">${Array.from({ length: 8 }, (_, i) => {
-        const a = i * Math.PI / 4;
-        return `<line x1="${250 + Math.cos(a) * 22}" y1="${580 + Math.sin(a) * 22}" x2="${250 + Math.cos(a) * 44}" y2="${580 + Math.sin(a) * 44}" stroke="#C38F3A" stroke-width="5" stroke-linecap="round"/>`;
-      }).join("")}</g>
+      <!-- contact pulse: simple rings where the wire ends meet -->
+      <circle data-k="cring" cx="250" cy="580" r="10" fill="none" stroke="#2C5E45" stroke-width="4"/>
+      <circle data-k="cring" cx="250" cy="580" r="10" fill="none" stroke="#2C5E45" stroke-width="4"/>
+      <circle data-k="cdot" cx="250" cy="580" r="7" fill="#2C5E45"/>
 
       <!-- question bubble -->
       <g data-k="bubble">
@@ -447,11 +446,13 @@ scenes.pipeline = {
     q(r, "wb").setAttribute("d", wireB(dy));
     q(r, "pa").setAttribute("y", 546 + dy);
     q(r, "pb").setAttribute("y", 590 - dy);
-    const sk = clamp((t - 2.78) / .7);
-    const spark = sk > 0 && sk < 1 ? Math.sin(Math.PI * sk) : 0;
-    S(q(r, "spark"), { op: spark * (1 - ko), s: lerp(.6, 1.25, E.outCubic(sk)) });
-    q(r, "spark").style.transformOrigin = "250px 580px";
-    q(r, "spark-glow").style.opacity = (spark * .9).toFixed(3);
+    // contact: a calm dot appears while the ends touch, with two soft rings
+    q(r, "cdot").style.opacity = (p(t, 2.7, .2) * (1 - p(t, 4.6, .3)) * (1 - ko)).toFixed(3);
+    qa(r, "cring").forEach((el, i) => {
+      const k = clamp((t - 2.8 - i * .3) / 1.0), e = E.outCubic(k);
+      el.setAttribute("r", (10 + 46 * e).toFixed(2));
+      el.style.opacity = (k <= 0 || k >= 1 ? 0 : (1 - e) * .8 * (1 - ko)).toFixed(3);
+    });
     // Arduino LED flashes when signal sent
     const led = Math.sin(Math.PI * clamp((t - 2.85) / .5));
     q(r, "led").setAttribute("fill", led > .05 ? "#F6D48C" : "#C38F3A");

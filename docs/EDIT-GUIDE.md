@@ -38,7 +38,7 @@ Read it in your own words. The timings line up with the table above.
 > "Hi, I'm Michel Aylabouni, Grade 10 at ICS Abu Dhabi, and this is Pocket Task. When you have a quick question, you usually unlock your phone, open an app, type, and scroll."
 
 **Shot 3 (why cards, 6 s, voice-over)**
-> "Pocket Task is for students and anyone who'd rather just ask. One physical trigger, speak, and hear the answer."
+> "Pocket Task is for students, with a built-in student mode for learning, and anyone who'd rather just ask. One physical trigger, speak, and hear the answer."
 
 **Shot 4 (pipeline, 12 s, voice-over)**
 > "Here's our working prototype. Touching two wires tells an Arduino to signal my laptop over USB. The laptop records my question, whisper.cpp turns it into text, an existing local model, Qwen 3.5, writes an answer, and the laptop speaks it out loud."
@@ -74,6 +74,7 @@ Read it in your own words. The timings line up with the table above.
 
 **Real demo (most important shot)**
 - One continuous wide shot that shows the **laptop screen, the Arduino, the USB cable and your hands with the wires** all at once. Add close-ups (wires touching, screen) as cutaways if you like.
+- If you can, show student mode being switched on or used for a few seconds. It's a real feature, so it's worth proving on camera.
 - Ask a short, clear question, for example the same "How do plants make food?" used in the animation, or something else you've tested.
 - Show the transcript appearing, press send, and let the spoken answer play with **real audio**.
 - If the AI takes several seconds to answer, you may trim the wait. If you do, show `badge-wait-shortened` at the cut (see 4c). Never speed up or fake the answer itself.
