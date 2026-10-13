@@ -115,6 +115,12 @@ if (want.has("overlays") || want.has("stills")) {
     console.log(`still -> renders/stills/${name}`);
   }
 }
+// footage frames (transparent window) for the final edit — large, kept out of git
+for (const id of ["frame-a", "frame-b", "frame-demo"])
+  if (want.has("frames") || want.has(id)) {
+    mkdirSync(path.join(outDir, "frames"), { recursive: true });
+    await renderScene(id, path.join(outDir, "frames", `${id}.mov`), true);
+  }
 if (want.has("animatic")) await renderAnimatic(path.join(outDir, "pocket-task-animatic-preview.mp4"));
 
 await browser.close();

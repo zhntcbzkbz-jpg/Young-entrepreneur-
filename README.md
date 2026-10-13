@@ -20,6 +20,15 @@ The style is cream and dark green, with clean type, restrained motion and large 
 
 All files are 1920×1080 at 30 fps. The MP4s are H.264. The MOVs are PNG-codec with alpha, which works in Premiere, DaVinci Resolve and Final Cut. Some CapCut versions show alpha MOVs on black; if yours does, use the PNGs.
 
+## Final video (built from Michel's real recordings)
+`edit/build_final.py` assembles the finished entry: it cuts the phone footage at the points in `animation/edl.js`, levels every voice to the same loudness, places the upright phone clips in framed windows (`frame-a`, `frame-b`, `frame-demo` scenes), adds the voice-overs under the animations, joins everything and exports a two-pass H.264 MP4. It then checks the duration is 30–90 s, the video is landscape, the audio is audible and the file is strictly under 30,000,000 bytes.
+
+```
+cd animation && node render.mjs frames && cd ..
+python3 edit/build_final.py <folder-with-your-clips> wristy-final.mp4
+```
+Your footage and the finished video are **not** stored in this public repo.
+
 ## Guides (`docs/`)
 - **`FILMING-CHECKLIST.md`**: what to film and record, in order, with exact words, clothing, phone orientation and target lengths.
 - **`EDIT-GUIDE.md`**: shot-by-shot timeline, narration, filming tips, step-by-step clip insertion, export settings that keep the file strictly under 30,000,000 bytes, and a final checklist.
