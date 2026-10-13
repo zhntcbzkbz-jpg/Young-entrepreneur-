@@ -23,7 +23,7 @@ window.PT_TIMELINE = [
   {
     id: "slot-c", type: "slot", dur: 8,
     label: "Presenter clip B — marketing & thanks",
-    say: "Possible marketing includes school demos, short online clips, and a student feedback pilot. Thank you for watching."
+    say: "My marketing plan is school demos, short online clips, and a student feedback pilot. Thank you for watching."
   },
   { id: "closing", type: "anim", dur: 5 }
 ];

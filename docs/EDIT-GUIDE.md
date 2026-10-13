@@ -52,8 +52,8 @@ No script. Keep your genuine question, the transcript review and the real spoken
 **Shot 7 (costs, 7 s, voice-over)** · 16 words ≈ 137 wpm
 > "These are draft costs and pricing for a USB trigger. The buyer uses their own laptop."
 
-**Shot 8 (Presenter B, 8 s, on camera)** · 17 words ≈ 128 wpm
-> "Possible marketing includes school demos, short online clips, and a student feedback pilot. Thank you for watching."
+**Shot 8 (Presenter B, 8 s, on camera)** · 18 words ≈ 135 wpm
+> "My marketing plan is school demos, short online clips, and a student feedback pilot. Thank you for watching."
 
 **Shot 9 (closing card, no voice, music fades out)**
 
@@ -147,7 +147,6 @@ Expect `mean_volume` roughly −30 to −16 dB and `max_volume` near −6 to −
 - [ ] Idea, problem, target users, differentiation (shots 2–3)
 - [ ] Prototype demonstration with real footage (shot 5)
 - [ ] Cost card: estimates still labelled as unverified, or replaced with checked figures (shot 7, see `BUSINESS-ANSWERS.md`)
-- [ ] Marketing lines: "DRAFT" tags removed only if you've approved those ideas
 - [ ] Future wristband clearly labelled as a concept (shot 6, already built in)
 - [ ] "Wait shortened" badge used if any waiting was cut
 - [ ] No claims of training Qwen, unlimited ability, web access, autonomous actions, battery life or WHOOP integration

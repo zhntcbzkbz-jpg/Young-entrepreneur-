@@ -7,7 +7,7 @@
   Any cost/price value left as "" shows on screen as a dashed
   "TO CONFIRM" box, so unfinished numbers can never look final.
   Marketing lines with confirmed: false show a small "DRAFT" tag.
-  Set confirmed: false only once you have checked the line.
+  Set confirmed: true only once you have checked the line.
 */
 window.PT_CONTENT = {
   projectName: "Pocket Task",
@@ -47,11 +47,11 @@ window.PT_CONTENT = {
   ],
   // Small note under the cost card. Leave "" to hide.
   costNote: "Unverified estimates and a proposed price for a USB trigger. The buyer uses their own laptop.",
-  // Marketing ideas — these are SUGGESTIONS until you confirm them.
+  // Marketing plan — approved by Michel (confirmed: true hides the DRAFT tag).
   marketing: [
-    { text: "Live demos at school events", confirmed: false },
-    { text: "Short demo clips on social media", confirmed: false },
-    { text: "A student feedback pilot", confirmed: false }
+    { text: "Live demos at school events", confirmed: true },
+    { text: "Short demo clips on social media", confirmed: true },
+    { text: "A student feedback pilot", confirmed: true }
   ],
 
   // Overlay badges

@@ -45,7 +45,7 @@ Pocket Task trigger button · USB-C cable · free Pocket Task laptop app (local 
 - **Runs locally on the laptop** with existing open models, so questions don't have to leave the computer and no subscription is needed.
 - **Transcript review** before sending, plus a typed-question fallback.
 
-## 7. Marketing ideas (DRAFT, not yet approved)
+## 7. Marketing plan (approved by Michel)
 1. **Live demos at school events** and fairs, so people can try it in 30 seconds.
 2. **Short demo clips on social media**, e.g. Instagram, TikTok or YouTube Shorts, showing one question and one answer.
 3. **A feedback pilot with student testers**: lend 10–20 units, collect feedback and improve before selling more.
