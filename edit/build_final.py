@@ -145,7 +145,7 @@ def main():
         ("05", lambda o: scene_with_vo("future", "04-future.mp4", vo.get("future"), footage, o)),
         ("06", lambda o: demo(edl, footage, o)),
         ("07", lambda o: scene_with_vo("cost", "05-cost.mp4", vo.get("cost"), footage, o)),
-        ("08", lambda o: presenter(edl["presenterB"], "frame-b.mov", footage, edl["winPresenter"], o)),
+        ("08", lambda o: presenter(edl["presenterB"], "frame-b.mov", footage, edl.get("winPresenterB", edl["winPresenter"]), o)),
         ("09", lambda o: scene_with_vo("closing", "06-closing.mp4", None, footage, o)),
     ]
     files = []

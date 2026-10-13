@@ -8,6 +8,7 @@
 window.PT_EDL = {
   winPresenter: { x: 150, y: 60, w: 540, h: 960, r: 30 },
   winDemo: { x: 1060, y: 60, w: 780, h: 960, r: 30 },
+  winPresenterB: { x: 690, y: 60, w: 540, h: 960, r: 30 },   // centred so points can sit where Michel points
 
   presenterA: {
     src: "IMG_0622", in: 0.35, out: 8.95,
@@ -20,7 +21,8 @@ window.PT_EDL = {
 
   presenterB: {
     src: "IMG_0634", in: 1.75, out: 9.65,
-    items: [[2.4, "Student feedback pilot"], [3.85, "Short online clips"], [5.55, "School demos"]],
+    // [time in clip, text, where he points: "up" | "left" | "right", y-centre on screen]
+    items: [[2.1, "Student feedback pilot", "up", 190], [3.95, "Short online clips", "left", 690], [5.25, "School demos", "right", 722]],
     thanks: 6.9
   },
 
