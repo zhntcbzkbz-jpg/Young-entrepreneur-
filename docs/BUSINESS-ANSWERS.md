@@ -1,10 +1,10 @@
-# Pocket Task: business answers
+# Wristy: business answers
 
 Solo project by Michel Aylabouni (Grade 10, ICS Abu Dhabi).
 All figures are **unverified estimates** in UAE dirhams, and the price is a **proposal**. None come from receipts or supplier quotes yet. Swap in real figures when you have them.
 
 ## Product being priced
-The first product is the **Pocket Task trigger button**: a small, single-button USB device plus the free Pocket Task laptop app.
+The first product is the **Wristy trigger button**: a small, single-button USB device plus the free Wristy laptop app.
 It is today's working prototype made neat and sellable. The laptop does the computing, as in the demo. The wristband is the later "future design" and is **not** priced here.
 
 ## 1. Prototype parts cost: ≈ AED 120
@@ -34,7 +34,7 @@ Assumes a first batch of about 200–500 units.
 - The app is included at no extra cost, with no subscription.
 
 ## 4. What's included
-Pocket Task trigger button · USB-C cable · free Pocket Task laptop app (local speech recognition, local AI answers, spoken replies, student mode for learning, transcript review, typed-question fallback).
+Wristy trigger button · USB-C cable · free Wristy laptop app (local speech recognition, local AI answers, spoken replies, student mode for learning, transcript review, typed-question fallback).
 
 ## 5. Target users
 - **Main:** secondary and university students who want quick answers while studying, without opening apps or getting distracted. The app already has a working student mode for learning.

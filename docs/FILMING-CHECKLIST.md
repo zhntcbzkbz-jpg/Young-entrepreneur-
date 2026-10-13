@@ -1,4 +1,4 @@
-# Pocket Task: filming checklist
+# Wristy: filming checklist
 
 Do these in order. Tick each box as you go. Everything is filmed by you, with your real prototype.
 
@@ -11,7 +11,7 @@ Do these in order. Tick each box as you go. Everything is filmed by you, with yo
 - [ ] Phone on a stand, a pile of books or a tripod, at eye level, about 1–1.5 m away. Use the **back camera** if you can.
 - [ ] Face a window or lamp so your face is lit. Nothing bright behind you.
 - [ ] Quiet room: close the door, and turn off fans and AC if you can. Put the phone on silent / Do Not Disturb.
-- [ ] Laptop charged, Pocket Task app open, Arduino plugged in, wires ready. Test once before filming.
+- [ ] Laptop charged, Wristy app open, Arduino plugged in, wires ready. Test once before filming.
 
 **Tip:** for every clip, start recording, **wait 2 seconds in silence**, say the line, then **wait 2 seconds** before stopping. That gives clean cut points.
 
@@ -21,7 +21,7 @@ Do these in order. Tick each box as you go. Everything is filmed by you, with yo
 - **Target length in the video:** 11 s (record about 15 s with the pauses)
 - **Framing:** head and shoulders, slightly left of centre. Leave empty space in the **lower-left** corner for your name banner.
 - **Say exactly:**
-  > "Hi, I'm Michel from Grade 10 at ICS Abu Dhabi. This is Pocket Task: a physical trigger for asking my laptop questions aloud."
+  > "Hi, I'm Michel from Grade 10 at ICS Abu Dhabi. This is Wristy: a physical trigger for asking my laptop questions aloud."
 - [ ] Recorded 3 takes · best take noted
 
 ## 2. Presenter B (marketing and thanks): on camera

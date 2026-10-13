@@ -1,4 +1,4 @@
-# Pocket Task: edit guide
+# Wristy: edit guide
 
 **Target:** about 80 s · 1920×1080 · 16:9 · MP4 (H.264 + AAC) · **strictly under 30,000,000 bytes**
 **Deadline:** 13 October 2026. The exact cutoff time is unconfirmed, so submit early.
@@ -12,7 +12,7 @@ Nothing in this package fakes the demo or the presenter.
 
 | # | Time | Length | Type | File / source | What's on screen |
 |---|------|--------|------|---------------|------------------|
-| 1 | 0:00–0:05 | 5 s | Animation | `renders/scenes/01-title.mp4` | Pocket Task logo, name, tagline, Michel Aylabouni · Grade 10 · ICS Abu Dhabi |
+| 1 | 0:00–0:05 | 5 s | Animation | `renders/scenes/01-title.mp4` | Wristy logo, name, tagline, Michel Aylabouni · Grade 10 · ICS Abu Dhabi |
 | 2 | 0:05–0:16 | 11 s | **[YOU] Presenter A** | your clip + `renders/overlays/lower-third-alpha.mov` | You on camera: your intro. Lower third from 0:06 to 0:11 |
 | 3 | 0:16–0:22 | 6 s | Animation | `renders/scenes/02-why.mp4` | Three cards: the problem, who it's for, what's different |
 | 4 | 0:22–0:34 | 12 s | Animation | `renders/scenes/03-pipeline.mp4` | Wires → Arduino → USB → laptop (Whisper → Qwen → speech). Laptop shown as the host |
@@ -35,7 +35,7 @@ Each line now fits its slot at a relaxed speaking pace of about 120–140 words 
 **Shot 1 (title, no voice, or a soft music sting)**
 
 **Shot 2 (Presenter A, 11 s, on camera)** · 23 words ≈ 125 wpm
-> "Hi, I'm Michel from Grade 10 at ICS Abu Dhabi. This is Pocket Task: a physical trigger for asking my laptop questions aloud."
+> "Hi, I'm Michel from Grade 10 at ICS Abu Dhabi. This is Wristy: a physical trigger for asking my laptop questions aloud."
 
 **Shot 3 (idea cards, 6 s, voice-over)** · 14 words ≈ 140 wpm
 > "It's for students, with a working student mode and a simple way to ask."

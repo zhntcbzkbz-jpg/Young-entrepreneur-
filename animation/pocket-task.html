@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pocket Task Animation</title>
+<title>Wristy Animation</title>
 <!--
-  POCKET TASK — ANIMATION SOURCE
+  WRISTY — ANIMATION SOURCE
   Open this file in Chrome/Edge to preview. Edit text in content.js,
   scene order/durations in timeline.js. Render MP4s with render.mjs.
   Every frame is a pure function of time, so renders are perfectly smooth
@@ -187,7 +187,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;",
 const draw = (el, k) => { if (el) el.style.strokeDashoffset = (1 - clamp(k)).toFixed(4); };
 
 /* --------------- shared graphics --------------- */
-// Pocket Task mark: rounded square with a big round button + sound arcs
+// Wristy mark: rounded square with a big round button + sound arcs
 function markSVG(size, bg, fg, acc) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 200 200" style="overflow:visible">
     <rect data-k="m-sq" x="10" y="10" width="180" height="180" rx="52" fill="${bg}"/>
@@ -386,7 +386,7 @@ scenes.pipeline = {
     <div class="abs" data-k="lbl-lap" style="left:930px;top:826px;width:840px;text-align:center;font:600 28px/1.25 var(--text)">Laptop = the host <span style="font-weight:500;color:var(--muted)">· microphone · AI · speaker</span></div>
 
     <div class="abs screen" data-k="screen">
-      <div class="bar"><i></i><i></i><i></i><b>Pocket Task</b><span style="margin-left:auto">local app</span></div>
+      <div class="bar"><i></i><i></i><i></i><b>${esc(C.projectName)}</b><span style="margin-left:auto">local app</span></div>
       <div class="stages">
         ${[["Listen", "laptop microphone"], ["Transcribe", "whisper.cpp (English)"], ["Answer", "Qwen3.5 0.8B · local"], ["Speak", "local text-to-speech"]].map((s, i) => `
           <div class="stg" data-k="stg"><div class="hl"></div><div class="acc"></div><div class="ic">${i + 1}</div><div class="a">${s[0]}</div><div class="b">${s[1]}</div></div>`).join("")}
@@ -561,7 +561,7 @@ scenes.pipeline = {
 };
 
 /* ---------------------------------------------------------------
-   POCKET TASK WRISTBAND — the ONE shared concept design.
+   WRISTY WRISTBAND — the ONE shared concept design.
    Dark navy fabric strap · compact rounded module · one physical
    button · no screen. Used by every wristband scene and still.
    Drawn as layered "2.5D": rotating around the vertical axis maps
@@ -642,7 +642,7 @@ scenes.future = {
         <g data-k="rings">${[0, 1].map(() => `<circle data-k="wring" r="70" fill="none" stroke="#C38F3A" stroke-width="5"/>`).join("")}</g>
       </g>
     </svg>
-    <div class="abs" data-k="h" style="left:1060px;top:300px;width:780px;font:700 72px/1.05 var(--display);letter-spacing:-.02em">Next: Pocket Task<br>on your wrist.</div>
+    <div class="abs" data-k="h" style="left:1060px;top:300px;width:780px;font:700 72px/1.05 var(--display);letter-spacing:-.02em">Next: ${esc(C.projectName)},<br>on your wrist.</div>
     <div class="abs" data-k="b1" style="left:1060px;top:500px;width:760px;font:500 38px/1.35 var(--text);color:var(--green)">One button. Press, ask,<br>hear the answer.</div>
     <div class="abs" data-k="b2" style="left:1060px;top:660px;display:flex;align-items:center;gap:16px;padding:20px 28px;border-radius:18px;background:#FBF7EE;border:2px solid var(--cream-3)">
       <span style="width:14px;height:14px;border-radius:50%;background:var(--brass);flex:none"></span>

@@ -1,5 +1,5 @@
 /*
-  POCKET TASK — FULL VIDEO TIMELINE (used by the animatic preview)
+  WRISTY — FULL VIDEO TIMELINE (used by the animatic preview)
   type "anim" = finished animation scene from pocket-task.html
   type "slot" = YOUR real footage goes here (placeholder in the animatic)
   Durations are in seconds. Total ≈ 80 s (limit is 30–90 s).
@@ -9,7 +9,7 @@ window.PT_TIMELINE = [
   {
     id: "slot-a", type: "slot", dur: 11,
     label: "Presenter clip A — intro",
-    say: "Hi, I'm Michel from Grade 10 at ICS Abu Dhabi. This is Pocket Task: a physical trigger for asking my laptop questions aloud."
+    say: "Hi, I'm Michel from Grade 10 at ICS Abu Dhabi. This is Wristy: a physical trigger for asking my laptop questions aloud."
   },
   { id: "why", type: "anim", dur: 6 },
   { id: "pipeline", type: "anim", dur: 12 },

@@ -1,9 +1,9 @@
 {
-  "name": "pocket-task-animation",
+  "name": "wristy-animation",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Pocket Task competition video animation package",
+  "description": "Wristy competition video animation package",
   "scripts": {
     "render": "node render.mjs",
     "render:scenes": "node render.mjs scenes",

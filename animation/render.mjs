@@ -1,4 +1,4 @@
-// Pocket Task — frame-accurate renderer
+// Wristy — frame-accurate renderer
 // Renders pocket-task.html frame by frame in headless Chromium and encodes with ffmpeg.
 //
 //   node render.mjs                 -> everything (scenes, overlays, stills, animatic)

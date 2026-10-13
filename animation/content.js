@@ -1,5 +1,5 @@
 /*
-  POCKET TASK — EDITABLE TEXT
+  WRISTY — EDITABLE TEXT
   ---------------------------------------------------------------
   Change any text here, save, then refresh pocket-task.html (preview)
   or re-run the render script. Keep the quotes and commas.
@@ -10,7 +10,7 @@
   Set confirmed: true only once you have checked the line.
 */
 window.PT_CONTENT = {
-  projectName: "Pocket Task",
+  projectName: "Wristy",
   tagline: "Ask aloud. Hear the answer.",
   student: "Michel Aylabouni",
   details: "Grade 10 · ICS Abu Dhabi",
