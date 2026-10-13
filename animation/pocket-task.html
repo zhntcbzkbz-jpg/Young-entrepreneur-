@@ -66,7 +66,7 @@
   .card { border-radius: 28px; padding: 44px 44px 40px; }
   .card .num { font: 600 22px/1 var(--text); letter-spacing: .18em; color: var(--brass); }
   .card .title { font: 700 42px/1.1 var(--display); margin: 26px 0 16px; letter-spacing: -.01em; }
-  .card .txt { font: 400 31px/1.38 var(--text); }
+  .card .txt { font: 400 36px/1.35 var(--text); }
 
   /* Caption bar */
   .caption {
@@ -84,7 +84,7 @@
 
   /* Laptop screen UI */
   .screen { left: 954px; top: 274px; width: 792px; height: 472px; color: var(--cream); overflow: hidden; border-radius: 10px; }
-  .screen .bar { height: 50px; display: flex; align-items: center; gap: 9px; padding: 0 20px; background: rgba(244,238,225,.06); font: 500 19px/1 var(--text); color: rgba(244,238,225,.7); }
+  .screen .bar { height: 50px; display: flex; align-items: center; gap: 9px; padding: 0 20px; background: rgba(244,238,225,.06); font: 500 21px/1 var(--text); color: rgba(244,238,225,.8); }
   .screen .bar i { width: 11px; height: 11px; border-radius: 50%; background: rgba(244,238,225,.25); display: inline-block; }
   .screen .bar b { margin-left: 10px; font-weight: 600; color: rgba(244,238,225,.85); }
   .stages { position: absolute; left: 16px; top: 66px; width: 300px; }
@@ -94,15 +94,15 @@
   .stg .ic { position: absolute; left: 16px; top: 22px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(244,238,225,.35); display:flex; align-items:center; justify-content:center; font: 700 17px/1 var(--display); color: rgba(244,238,225,.7); }
   .stg .ic.done { background: var(--sage); border-color: var(--sage); color: var(--green-deep); }
   .stg .a { font: 600 25px/1.1 var(--text); }
-  .stg .b { font: 400 17px/1.2 var(--text); color: rgba(244,238,225,.6); margin-top: 7px; }
+  .stg .b { font: 500 19px/1.2 var(--text); color: rgba(244,238,225,.78); margin-top: 7px; }
   .panel { position: absolute; left: 336px; top: 66px; width: 436px; height: 390px; border-radius: 16px; background: rgba(0,0,0,.18); }
   .panel .pv { position: absolute; inset: 0; padding: 26px 28px; }
-  .panel .lbl { font: 600 16px/1 var(--text); letter-spacing: .16em; text-transform: uppercase; color: var(--brass-soft); }
+  .panel .lbl { font: 700 19px/1 var(--text); letter-spacing: .14em; text-transform: uppercase; color: var(--brass-soft); }
   .panel .q { font: 500 32px/1.3 var(--text); margin-top: 22px; color: var(--cream); }
   .panel .ans { font: 500 27px/1.38 var(--text); margin-top: 20px; }
   .panel .ans span { will-change: opacity; }
-  .chip { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 30px; font: 600 18px/1 var(--text); }
-  .note { font: 400 16px/1.2 var(--text); color: rgba(244,238,225,.45); position: absolute; left: 28px; bottom: 22px; }
+  .chip { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 30px; font: 600 21px/1 var(--text); }
+  .note { font: 600 21px/1.2 var(--text); color: #F4EEE1; background: rgba(195,143,58,.35); padding: 7px 14px; border-radius: 8px; position: absolute; left: 28px; bottom: 20px; }
 
   /* Cost card */
   .field-row { display: flex; align-items: center; justify-content: space-between; gap: 28px; height: 104px; border-bottom: 2px solid var(--cream-3); }
@@ -114,7 +114,7 @@
   .mk { display: flex; align-items: flex-start; gap: 22px; margin-bottom: 26px; }
   .mk .dot { flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--brass); margin-top: 12px; }
   .mk .tx { font: 500 33px/1.32 var(--text); color: var(--cream); }
-  .draft { display: block; width: fit-content; margin-top: 10px; padding: 6px 10px; border-radius: 6px; border: 2px dashed var(--brass-soft); color: var(--brass-soft); font: 700 15px/1 var(--text); letter-spacing: .14em; }
+  .draft { display: block; width: fit-content; margin-top: 10px; padding: 7px 12px; border-radius: 6px; border: 2px dashed var(--brass-soft); color: var(--brass-soft); font: 700 19px/1 var(--text); letter-spacing: .12em; }
 
   /* Badges / lower third */
   .badge { display: inline-flex; align-items: center; gap: 22px; padding: 20px 34px 20px 24px; border-radius: 22px; background: rgba(24,58,43,.94); color: var(--cream); box-shadow: 0 12px 34px rgba(0,0,0,.25); }
@@ -379,14 +379,14 @@ scenes.pipeline = {
       <g data-k="qarcs">${arcs(872, 340, 3, 16, 16, "#2C5E45", 5, "q-arc", 1, 40)}</g>
     </svg>
 
-    <div class="abs" data-k="lbl-trig" style="left:118px;top:690px;width:264px;text-align:center;font:600 24px/1.25 var(--text)">Temporary trigger<div style="font-weight:400;color:var(--muted);font-size:21px;margin-top:4px">two jumper wires</div></div>
-    <div class="abs" data-k="lbl-ard" style="left:432px;top:690px;width:300px;text-align:center;font:600 24px/1.25 var(--text)">Arduino Uno R3<div style="font-weight:400;color:var(--muted);font-size:21px;margin-top:4px">controller only, via USB</div></div>
-    <div class="abs" data-k="lbl-lap" style="left:930px;top:826px;width:840px;text-align:center;font:600 24px/1.25 var(--text)">Laptop = the host <span style="font-weight:400;color:var(--muted)">· microphone · AI · speaker</span></div>
+    <div class="abs" data-k="lbl-trig" style="left:98px;top:690px;width:304px;text-align:center;font:600 27px/1.25 var(--text)">Temporary trigger<div style="font-weight:500;color:var(--muted);font-size:24px;margin-top:4px">two jumper wires</div></div>
+    <div class="abs" data-k="lbl-ard" style="left:412px;top:690px;width:340px;text-align:center;font:600 27px/1.25 var(--text)">Arduino Uno R3<div style="font-weight:500;color:var(--muted);font-size:24px;margin-top:4px">controller only, via USB</div></div>
+    <div class="abs" data-k="lbl-lap" style="left:930px;top:826px;width:840px;text-align:center;font:600 28px/1.25 var(--text)">Laptop = the host <span style="font-weight:500;color:var(--muted)">· microphone · AI · speaker</span></div>
 
     <div class="abs screen" data-k="screen">
       <div class="bar"><i></i><i></i><i></i><b>Pocket Task</b><span style="margin-left:auto">local app</span></div>
       <div class="stages">
-        ${[["Listen", "laptop microphone"], ["Transcribe", "whisper.cpp · English base"], ["Answer", "Qwen3.5 0.8B · local"], ["Speak", "local text-to-speech"]].map((s, i) => `
+        ${[["Listen", "laptop microphone"], ["Transcribe", "whisper.cpp (English)"], ["Answer", "Qwen3.5 0.8B · local"], ["Speak", "local text-to-speech"]].map((s, i) => `
           <div class="stg" data-k="stg"><div class="hl"></div><div class="acc"></div><div class="ic">${i + 1}</div><div class="a">${s[0]}</div><div class="b">${s[1]}</div></div>`).join("")}
       </div>
       <div class="panel">
@@ -398,13 +398,13 @@ scenes.pipeline = {
         <div class="pv" data-k="pv-txt">
           <div class="lbl">Transcript · review first</div>
           <div class="q" data-k="typed"></div>
-          <div class="chip" data-k="send" style="position:absolute;left:28px;bottom:66px;background:var(--brass);color:var(--green-deep)">✓ Send</div>
+          <div class="chip" data-k="send" style="position:absolute;left:28px;bottom:84px;background:var(--brass);color:var(--green-deep)">✓ Send</div>
         </div>
         <div class="pv" data-k="pv-ans">
           <div class="lbl">Answer</div>
           <div data-k="think" style="display:flex;gap:12px;margin-top:34px">${[0,1,2].map(() => `<i data-k="td" style="width:16px;height:16px;border-radius:50%;background:var(--cream);display:block"></i>`).join("")}</div>
           <div class="ans" data-k="ans" style="position:absolute;left:28px;right:28px;top:44px">${C.sampleAnswer.split(" ").map(w => `<span>${esc(w)} </span>`).join("")}</div>
-          <div class="chip" data-k="speaking" style="position:absolute;left:28px;bottom:58px;background:rgba(244,238,225,.12);color:var(--cream)">
+          <div class="chip" data-k="speaking" style="position:absolute;left:28px;bottom:84px;background:rgba(244,238,225,.12);color:var(--cream)">
             <svg width="30" height="22" viewBox="0 0 30 22">${[0,1,2,3,4].map(i => `<rect data-k="sb" x="${i * 6.5}" y="3" width="4" height="16" rx="2" fill="#F4EEE1"/>`).join("")}</svg>Speaking…</div>
         </div>
         <div class="note">Illustrative example</div>
@@ -632,14 +632,14 @@ scenes.cost = {
   dur: 7, bg: "bg-cream",
   html: () => `
     <div class="abs eyebrow" data-k="eb" style="left:120px;top:110px">The business</div>
-    <div class="abs h1" data-k="h" style="left:120px;top:150px">Cost, price &amp; marketing</div>
+    <div class="abs h1" data-k="h" style="left:120px;top:150px">Cost, price &amp; marketing <span style="font:700 26px/1 var(--text);letter-spacing:.12em;color:#9C6E22;border:3px dashed var(--brass);border-radius:12px;padding:10px 16px;vertical-align:14px;margin-left:18px">DRAFT ESTIMATES</span></div>
     <div class="abs card" data-k="c1" style="left:120px;top:300px;width:960px;height:500px;background:#FBF7EE;border:2px solid var(--cream-2);box-shadow:0 18px 50px rgba(24,58,43,.08);padding:36px 50px">
       ${C.cost.map(f => `<div class="field-row" data-k="row"><div class="l">${esc(f.label)}</div>
         <div class="v ${f.value ? "filled" : "empty"}">${f.value ? esc(f.value) : "TO CONFIRM"}</div></div>`).join("")}
     </div>
-    ${C.costNote ? `<div class="abs" data-k="note" style="left:120px;top:836px;width:1680px;font:400 26px/1.35 var(--text);color:var(--muted)">${esc(C.costNote)}</div>` : ""}
+    ${C.costNote ? `<div class="abs" data-k="note" style="left:120px;top:836px;width:1680px;font:600 30px/1.35 var(--text);color:var(--green-2)">${esc(C.costNote)}</div>` : ""}
     <div class="abs card" data-k="c2" style="left:1120px;top:300px;width:680px;height:500px;background:var(--green);box-shadow:0 18px 50px rgba(24,58,43,.22);padding:50px 54px">
-      <div class="eyebrow" style="color:var(--brass-soft)">How I'll reach people</div>
+      <div class="eyebrow" style="color:var(--brass-soft)">Marketing ideas</div>
       <div style="margin-top:40px">
         ${C.marketing.map(m => `<div class="mk" data-k="mk"><div class="dot"></div><div class="tx">${esc(m.text)}${m.confirmed ? "" : `<span class="draft">DRAFT</span>`}</div></div>`).join("")}
       </div>

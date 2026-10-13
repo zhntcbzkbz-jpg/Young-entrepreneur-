@@ -10,7 +10,7 @@ The style is cream and dark green, with clean type, restrained motion and large 
 | `scenes/02-why.mp4` | 6 s | Problem / target users / what's different |
 | `scenes/03-pipeline.mp4` | 12 s | Wires → Arduino (USB) → laptop: whisper.cpp → Qwen3.5 0.8B (local) → speech |
 | `scenes/04-future.mp4` | 6 s | Wristband concept, labelled **FUTURE DESIGN** |
-| `scenes/05-cost.mp4` | 7 s | Cost (≈ AED 120 prototype, ≈ AED 55 per unit), price AED 149, what's included, marketing |
+| `scenes/05-cost.mp4` | 7 s | Unverified estimates (≈ AED 120 prototype, ≈ AED 55 per unit), proposed price AED 149, marketing ideas marked DRAFT |
 | `scenes/06-closing.mp4` | 5 s | Closing card |
 | `overlays/lower-third-alpha.mov` (+ `.png`) | 5 s | Name lower third, transparent |
 | `overlays/badge-real-demo-alpha.mov` (+ `.png`) | 3 s | "Real prototype demo" badge |
@@ -20,7 +20,7 @@ The style is cream and dark green, with clean type, restrained motion and large 
 All files are 1920×1080 at 30 fps. The MP4s are H.264. The MOVs are PNG-codec with alpha, which works in Premiere, DaVinci Resolve and Final Cut. Some CapCut versions show alpha MOVs on black; if yours does, use the PNGs.
 
 ## Guides (`docs/`)
-- **`EDIT-GUIDE.md`**: shot-by-shot timeline, narration, filming tips, step-by-step clip insertion, export settings that keep the file under 30 MB, and a final checklist.
+- **`EDIT-GUIDE.md`**: shot-by-shot timeline, narration, filming tips, step-by-step clip insertion, export settings that keep the file strictly under 30,000,000 bytes, and a final checklist.
 - **`BUSINESS-ANSWERS.md`**: cost breakdowns, price and margin, target users, differentiation, marketing, and answers to likely judge questions.
 - **`PROJECT-DESCRIPTION.md`**: a 474-character description draft (limit 500) and a shorter alternative.
 
@@ -47,6 +47,6 @@ If you want different numbers but don't want to install anything, place your own
 - Qwen3.5 0.8B and whisper.cpp are shown as existing tools that run locally, not something built or trained here.
 - The screen content is labelled "Illustrative example". Your real demo footage is the evidence.
 - The wristband is permanently labelled as a concept that isn't built yet. There is no WHOOP branding or integration claim.
-- Costs are labelled as estimates. Empty cost fields in `content.js` render as "TO CONFIRM", and marketing lines with `confirmed: false` get a "DRAFT" tag.
+- Costs are labelled as unverified estimates and the price as a proposal. Marketing ideas show DRAFT until approved. Empty cost fields in `content.js` render as "TO CONFIRM", and marketing lines with `confirmed: false` get a "DRAFT" tag.
 
 Fonts: Inter (SIL Open Font License), bundled in `animation/assets/fonts/`.

@@ -1,7 +1,7 @@
 # Pocket Task: business answers
 
 Solo project by Michel Aylabouni (Grade 10, ICS Abu Dhabi).
-All figures are **estimates** in UAE dirhams. Swap in real receipts or quotes if you have them.
+All figures are **unverified estimates** in UAE dirhams, and the price is a **proposal**. None come from receipts or supplier quotes yet. Swap in real figures when you have them.
 
 ## Product being priced
 The first product is the **Pocket Task trigger button**: a small, single-button USB device plus the free Pocket Task laptop app.
@@ -12,7 +12,7 @@ It is today's working prototype made neat and sellable. The laptop does the comp
 |---|---|
 | Arduino Uno R3 | AED 95 |
 | Jumper wires | AED 10 |
-| USB cable | AED 15 |
+| USB cable | AED 15 (unchecked: a boxed official Uno R3 usually comes without a cable, but starter kits and many clone boards include one. If yours did, this is AED 0 and the total is ≈ AED 105) |
 | Software: whisper.cpp, Qwen3.5 0.8B, text-to-speech | AED 0 (free, existing open tools) |
 | **Total** | **≈ AED 120** (my own laptop, not included) |
 
@@ -29,7 +29,7 @@ Assumes a first batch of about 200–500 units.
 | **Total** | **≈ AED 55** |
 
 ## 3. Proposed selling price: AED 149
-- Gross margin: 149 − 55 = **AED 94 per unit (~63 %)**. That covers marketing, delivery, payment fees and returns.
+- Estimated price minus unit cost: 149 − 55 = **AED 94 per unit, before any other expenses**. Delivery, payment fees, marketing and returns haven't been budgeted yet, so the real profit per unit will be lower.
 - It's priced like a pair of mid-range earphones, aiming to feel affordable for students and parents.
 - The app is included at no extra cost, with no subscription.
 
@@ -45,7 +45,7 @@ Pocket Task trigger button · USB-C cable · free Pocket Task laptop app (local 
 - **Runs locally on the laptop** with existing open models, so questions don't have to leave the computer and no subscription is needed.
 - **Transcript review** before sending, plus a typed-question fallback.
 
-## 7. Marketing plan
+## 7. Marketing ideas (DRAFT, not yet approved)
 1. **Live demos at school events** and fairs, so people can try it in 30 seconds.
 2. **Short demo clips on social media**, e.g. Instagram, TikTok or YouTube Shorts, showing one question and one answer.
 3. **A feedback pilot with student testers**: lend 10–20 units, collect feedback and improve before selling more.

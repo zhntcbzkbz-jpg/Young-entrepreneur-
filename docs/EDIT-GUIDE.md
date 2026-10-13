@@ -1,6 +1,6 @@
 # Pocket Task: edit guide
 
-**Target:** about 80 s · 1920×1080 · 16:9 · MP4 (H.264 + AAC) · **under 30 MB**
+**Target:** about 80 s · 1920×1080 · 16:9 · MP4 (H.264 + AAC) · **strictly under 30,000,000 bytes**
 **Deadline:** 13 October 2026. The exact cutoff time is unconfirmed, so submit early.
 
 Everything marked **[YOU]** has to come from you: real footage, confirmed numbers and your own voice.
@@ -28,36 +28,34 @@ Nothing in this package fakes the demo or the presenter.
 
 ---
 
-## 2. Suggested narration (about 170 words, a calm pace)
+## 2. Suggested narration (107 words, a relaxed pace)
 
-Read it in your own words. The timings line up with the table above.
+Each line now fits its slot at a relaxed speaking pace of about 120–140 words per minute, with a short pause at the start and end. Read each one aloud with a timer before recording. If a line feels rushed, cut words rather than speaking faster.
 
 **Shot 1 (title, no voice, or a soft music sting)**
 
-**Shot 2 (Presenter A, 11 s)**
-> "Hi, I'm Michel Aylabouni, Grade 10 at ICS Abu Dhabi, and this is Pocket Task. When you have a quick question, you usually unlock your phone, open an app, type, and scroll."
+**Shot 2 (Presenter A, 11 s, on camera)** · 23 words ≈ 125 wpm
+> "Hi, I'm Michel from Grade 10 at ICS Abu Dhabi. This is Pocket Task: a physical trigger for asking my laptop questions aloud."
 
-**Shot 3 (why cards, 6 s, voice-over)**
-> "Pocket Task is for students, with a built-in student mode for learning, and anyone who'd rather just ask. One physical trigger, speak, and hear the answer."
+**Shot 3 (idea cards, 6 s, voice-over)** · 14 words ≈ 140 wpm
+> "It's for students, with a working student mode and a simple way to ask."
 
-**Shot 4 (pipeline, 12 s, voice-over)**
-> "Here's our working prototype. Touching two wires tells an Arduino to signal my laptop over USB. The laptop records my question, whisper.cpp turns it into text, an existing local model, Qwen 3.5, writes an answer, and the laptop speaks it out loud."
+**Shot 4 (how it works, 12 s, voice-over)** · 25 words ≈ 125 wpm
+> "Touching two wires tells my Arduino to signal my laptop. Whisper transcribes my question. I check it, then local Qwen answers and the laptop speaks."
 
-**Shot 5 (real demo, 20 s)** Let the real audio play: the question, then the spoken answer. Add at most one line, e.g.
-> "I can check the transcript before sending it."
+**Shot 5 (real demo, 20 s)**
+No script. Keep your genuine question, the transcript review and the real spoken answer, with their real audio. If you cut out any waiting time, put the "Wait shortened in editing" badge on that cut.
 
-**Shot 6 (future, 6 s, voice-over)**
-> "The goal is a smaller, wrist-worn version. That design is still a concept: it needs an enclosure, a proper switch, power and smaller hardware."
+**Shot 6 (future design, 6 s, voice-over)** · 12 words ≈ 120 wpm
+> "Next is a wrist-worn version. It's a concept that still needs development."
 
-**Shot 7 (cost, 7 s, voice-over)**
-> "The prototype parts cost about 120 dirhams. A production unit should cost about 55, and I plan to sell it for 149, with the button, cable and app included."
+**Shot 7 (costs, 7 s, voice-over)** · 16 words ≈ 137 wpm
+> "These are draft costs and pricing for a USB trigger. The buyer uses their own laptop."
 
-(Where these numbers come from: `docs/BUSINESS-ANSWERS.md`.)
+**Shot 8 (Presenter B, 8 s, on camera)** · 17 words ≈ 128 wpm
+> "Possible marketing includes school demos, short online clips, and a student feedback pilot. Thank you for watching."
 
-**Shot 8 (Presenter B, 8 s)**
-> "I'll start with live demos at school events and short clips online, then a feedback pilot with student testers. Thank you for watching."
-
-**Shot 9 (closing, no voice, music fades out)**
+**Shot 9 (closing card, no voice, music fades out)**
 
 **Things not to say:** don't say "we built an AI" or "I trained the model" (Qwen is an existing model). Avoid "it can do anything", "it searches the internet", "it does tasks for you", any battery life figure, and "WHOOP integration".
 
@@ -109,7 +107,7 @@ Works the same in CapCut (desktop), DaVinci Resolve (free), Premiere Pro and Cli
 - Optional music on A3 at about −28 dB (very quiet under the voice). Use only royalty-free music, e.g. CapCut's library or the YouTube Audio Library.
 - Normalise voice to about −16 LUFS, or raise it until it peaks around −6 dB.
 
-### e) Export (must be under 30 MB)
+### e) Export (must be strictly under 30,000,000 bytes)
 | Setting | Value |
 |---|---|
 | Format | MP4 (H.264) |
@@ -120,7 +118,7 @@ Works the same in CapCut (desktop), DaVinci Resolve (free), Premiere Pro and Cli
 CapCut: Export → Resolution 1080p → Bit rate "Lower" or custom ≈ 2.5 Mbps → check the size shown before saving.
 Resolve: Deliver → MP4 → H.264 → Quality: restrict to **2500 Kb/s**.
 
-**Check:** right-click the file → Properties. It must be **under 30 MB** and between **30 and 90 s**. If it's over: lower the bitrate to 2,000 kbps or export at 720p.
+**Check:** right-click the file → Properties and read the size **in bytes** (not the rounded MB figure). It must be **below 30,000,000 bytes** and between **30 and 90 s**. Windows and macOS round differently, so the byte count is the one to trust. If it's over: lower the bitrate to 2,000 kbps or export at 720p.
 
 **Fallback with ffmpeg** (if you have it). This always lands near 20 MB for 80 s:
 ```
@@ -131,16 +129,25 @@ ffmpeg -i my-edit.mp4 -c:v libx264 -b:v 2500k -maxrate 3000k -bufsize 5000k -pre
 ```
 ffmpeg -i my-edit.mp4 -vf scale=1280:720:flags=lanczos -r 30 -c:v libx264 -preset slow -b:v 2000k -maxrate 2500k -bufsize 4000k -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart pocket-task-final-720p.mp4
 ```
-Check it with `ffprobe -v error -show_entries format=duration,size -of default=nw=1 pocket-task-final-720p.mp4`. Size is in bytes and must be below 31,457,280 (30 MB).
+Check it with `ffprobe -v error -show_entries format=duration,size -of default=nw=1 pocket-task-final-720p.mp4`. Size is in bytes and must be **below 30,000,000**. (31,457,280 is 30 MiB, which is bigger than 30 MB, so don't use it.)
+
+**Check the narration is audible** (a silent track reads around −91 dB):
+```
+ffmpeg -i pocket-task-final-720p.mp4 -af volumedetect -vn -f null - 2>&1 | grep -E "mean_volume|max_volume"
+```
+Expect `mean_volume` roughly −30 to −16 dB and `max_volume` near −6 to −1 dB. Also check the width is bigger than the height (landscape) in the `ffprobe` output: `ffprobe -v error -show_entries stream=width,height -of csv=p=0 pocket-task-final-720p.mp4`.
 
 ---
 
 ## 5. Final checklist before submitting
-- [ ] Length 30–90 s, 16:9 landscape, MP4, < 30 MB
+- [ ] Length 30–90 s, 16:9 landscape, MP4, **< 30,000,000 bytes**
+- [ ] Narration and demo audio audible in the final file (volumedetect check above)
+- [ ] No grey "INSERT" placeholder screens left
 - [ ] Student name and project name visible (title, lower third, closing)
 - [ ] Idea, problem, target users, differentiation (shots 2–3)
 - [ ] Prototype demonstration with real footage (shot 5)
-- [ ] Cost and price on screen match what you say (shot 7, see `BUSINESS-ANSWERS.md`)
+- [ ] Cost card: estimates still labelled as unverified, or replaced with checked figures (shot 7, see `BUSINESS-ANSWERS.md`)
+- [ ] Marketing lines: "DRAFT" tags removed only if you've approved those ideas
 - [ ] Future wristband clearly labelled as a concept (shot 6, already built in)
 - [ ] "Wait shortened" badge used if any waiting was cut
 - [ ] No claims of training Qwen, unlimited ability, web access, autonomous actions, battery life or WHOOP integration
