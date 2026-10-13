@@ -55,8 +55,8 @@ window.PT_CONTENT = {
   ],
 
   // Overlay badges
-  demoBadge: "Real prototype demo",
-  demoBadgeSub: "Laptop + Arduino Uno R3",
+  demoBadge: "Working laptop-connected prototype",
+  demoBadgeSub: "Real footage · Arduino Uno R3 · the laptop runs the AI",
   shortenedBadge: "Wait shortened in editing",
   shortenedBadgeSub: "Real response took longer"
 };

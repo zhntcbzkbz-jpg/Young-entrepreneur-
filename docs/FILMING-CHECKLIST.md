@@ -53,7 +53,7 @@ Use the phone's voice recorder (Voice Memos on iPhone). Orientation doesn't matt
 |---|---|---|---|
 | `vo-3` | idea cards | 6 s | "It's for students, with a working student mode and a simple way to ask." |
 | `vo-4` | how it works | 12 s | "Touching two wires tells my Arduino to signal my laptop. Whisper transcribes my question. I check it, then local Qwen answers and the laptop speaks." |
-| `vo-6` | future design | 6 s | "Next is a wrist-worn version. It's a concept that still needs development." |
+| `vo-6` | future wristband | 6 s | "Next is a wrist-worn version. It's a concept that still needs development." |
 | `vo-7` | costs | 7 s | "These are draft costs and pricing for a USB trigger. The buyer uses their own laptop." |
 
 - [ ] vo-3 · [ ] vo-4 · [ ] vo-6 · [ ] vo-7, each timed. If a line runs long, cut words; don't rush.

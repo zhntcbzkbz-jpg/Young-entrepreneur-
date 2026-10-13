@@ -3,7 +3,8 @@
 //
 //   node render.mjs                 -> everything (scenes, overlays, stills, animatic)
 //   node render.mjs scenes          -> one MP4 per animation scene
-//   node render.mjs overlays        -> transparent MOV overlays + PNG badges
+//   node render.mjs overlays        -> transparent MOV overlays + PNG badges + wristband stills
+//   node render.mjs stills          -> wristband concept stills only
 //   node render.mjs animatic        -> full 80 s preview with placeholder slots
 //   node render.mjs title pipeline  -> only the named scenes
 //   add  --fps 60  for 60 fps (default 30)
@@ -99,11 +100,20 @@ for (const [id, name] of order)
 if (want.has("overlays") || want.has("lowerthird"))
   await renderScene("lowerthird", path.join(outDir, "overlays", "lower-third-alpha.mov"), true);
 if (want.has("overlays")) {
-  await renderScene("badge-demo", path.join(outDir, "overlays", "badge-real-demo-alpha.mov"), true);
+  await renderScene("badge-demo", path.join(outDir, "overlays", "badge-working-prototype-alpha.mov"), true);
   await renderScene("badge-shortened", path.join(outDir, "overlays", "badge-wait-shortened-alpha.mov"), true);
   await still("lowerthird", 2.5, path.join(outDir, "overlays", "lower-third.png"));
-  await still("badge-demo", 1.5, path.join(outDir, "overlays", "badge-real-demo.png"));
+  await still("badge-demo", 1.5, path.join(outDir, "overlays", "badge-working-prototype.png"));
   await still("badge-shortened", 1.5, path.join(outDir, "overlays", "badge-wait-shortened.png"));
+}
+if (want.has("overlays") || want.has("stills")) {
+  // wristband concept stills — same shared band design as the video
+  mkdirSync(path.join(outDir, "stills"), { recursive: true });
+  for (const [t, name] of [[1.6, "wristband-concept-closeup.png"], [5.0, "wristband-concept-full.png"]]) {
+    await page.evaluate(([id, t]) => window.PT.render(id, t), ["future", t]);
+    await page.screenshot({ path: path.join(outDir, "stills", name), type: "png" });
+    console.log(`still -> renders/stills/${name}`);
+  }
 }
 if (want.has("animatic")) await renderAnimatic(path.join(outDir, "pocket-task-animatic-preview.mp4"));
 

@@ -13,16 +13,16 @@ Nothing in this package fakes the demo or the presenter.
 | # | Time | Length | Type | File / source | What's on screen |
 |---|------|--------|------|---------------|------------------|
 | 1 | 0:00–0:05 | 5 s | Animation | `renders/scenes/01-title.mp4` | Pocket Task logo, name, tagline, Michel Aylabouni · Grade 10 · ICS Abu Dhabi |
-| 2 | 0:05–0:16 | 11 s | **[YOU] Presenter A** | your clip + `renders/overlays/lower-third-alpha.mov` | You on camera: intro and the problem. Lower third from 0:06 to 0:11 |
+| 2 | 0:05–0:16 | 11 s | **[YOU] Presenter A** | your clip + `renders/overlays/lower-third-alpha.mov` | You on camera: your intro. Lower third from 0:06 to 0:11 |
 | 3 | 0:16–0:22 | 6 s | Animation | `renders/scenes/02-why.mp4` | Three cards: the problem, who it's for, what's different |
 | 4 | 0:22–0:34 | 12 s | Animation | `renders/scenes/03-pipeline.mp4` | Wires → Arduino → USB → laptop (Whisper → Qwen → speech). Laptop shown as the host |
-| 5 | 0:34–0:54 | 20 s | **[YOU] Real demo** | your clip + `badge-real-demo` overlay | Real wires, real question, transcript on screen, spoken answer |
-| 6 | 0:54–1:00 | 6 s | Animation | `renders/scenes/04-future.mp4` | Wristband concept, permanently labelled **FUTURE DESIGN · concept, not built yet** |
+| 5 | 0:34–0:40 | 6 s | Animation | `renders/scenes/04-future.mp4` | Navy fabric wristband: close-up, slow turn, full band. **FUTURE WRISTBAND CONCEPT** label the whole time, plus "Not built yet. Today, the laptop runs the AI." Ends with a green wipe and the prototype label |
+| 6 | 0:40–1:00 | 20 s | **[YOU] Real demo** | your clip + `badge-working-prototype` overlay | **Working laptop-connected prototype**: real wires, real question, transcript on screen, spoken answer |
 | 7 | 1:00–1:07 | 7 s | Animation | `renders/scenes/05-cost.mp4` | ≈ AED 120 parts · ≈ AED 55 per unit · AED 149 price · button, cable and app included, plus the marketing plan |
 | 8 | 1:07–1:15 | 8 s | **[YOU] Presenter B** | your clip | Marketing in one sentence, then thanks |
 | 9 | 1:15–1:20 | 5 s | Animation | `renders/scenes/06-closing.mp4` | Closing card on dark green |
 
-**Total: 80 s.** You have 10 s of slack before the 90 s limit. If the demo needs more time, take it from shot 2 or 8 first.
+**Total: 80 s.** You have 10 s of slack before the 90 s limit. That slack is there for your updated intro (shot 2 can grow to about 21 s) or a longer demo. If you use it, re-check the total stays under 90 s.
 
 `renders/pocket-task-animatic-preview.mp4` is this same timeline with grey **INSERT** slates where your clips go. Put it on a muted track as a guide, or edit straight over it.
 
@@ -43,11 +43,11 @@ Each line now fits its slot at a relaxed speaking pace of about 120–140 words 
 **Shot 4 (how it works, 12 s, voice-over)** · 25 words ≈ 125 wpm
 > "Touching two wires tells my Arduino to signal my laptop. Whisper transcribes my question. I check it, then local Qwen answers and the laptop speaks."
 
-**Shot 5 (real demo, 20 s)**
-No script. Keep your genuine question, the transcript review and the real spoken answer, with their real audio. If you cut out any waiting time, put the "Wait shortened in editing" badge on that cut.
-
-**Shot 6 (future design, 6 s, voice-over)** · 12 words ≈ 120 wpm
+**Shot 5 (future wristband, 6 s, voice-over)** · 12 words ≈ 120 wpm
 > "Next is a wrist-worn version. It's a concept that still needs development."
+
+**Shot 6 (real demo, 20 s)**
+No script. Keep your genuine question, the transcript review and the real spoken answer, with their real audio. If you cut out any waiting time, put the "Wait shortened in editing" badge on that cut.
 
 **Shot 7 (costs, 7 s, voice-over)** · 16 words ≈ 137 wpm
 > "These are draft costs and pricing for a USB trigger. The buyer uses their own laptop."
@@ -76,7 +76,7 @@ No script. Keep your genuine question, the transcript review and the real spoken
 - Ask a short, clear question, for example the same "How do plants make food?" used in the animation, or something else you've tested.
 - Show the transcript appearing, press send, and let the spoken answer play with **real audio**.
 - If the AI takes several seconds to answer, you may trim the wait. If you do, show `badge-wait-shortened` at the cut (see 4c). Never speed up or fake the answer itself.
-- If you film the WHOOP strap for the future shot, show it only as a **form-factor prop**. Say or caption "shape reference only, no WHOOP integration", or leave it out.
+- Don't film another wristband or strap for the future shot. The animated band is the one concept design, so keep it consistent. If you do show your WHOOP strap, show it only as a **form-factor prop**. Say or caption "shape reference only, no WHOOP integration", or leave it out.
 
 ---
 
@@ -90,7 +90,7 @@ Works the same in CapCut (desktop), DaVinci Resolve (free), Premiere Pro and Cli
 3. Optional: drop `pocket-task-animatic-preview.mp4` onto the top track, mute it and lower its opacity to about 30 %. It shows exactly where each piece goes. Delete it before export.
 
 ### b) Main track (V1), in order
-`01-title` → Presenter A → `02-why` → `03-pipeline` → Real demo → `04-future` → `05-cost` → Presenter B → `06-closing`
+`01-title` → Presenter A → `02-why` → `03-pipeline` → `04-future` → Real demo → `05-cost` → Presenter B → `06-closing`
 
 - Trim your clips to the slot lengths in the table (± a second is fine).
 - The animations already ease in and out, so **plain cuts** look clean. If you want transitions, use a 6–10 frame cross-dissolve only between your footage and an animation.
@@ -98,7 +98,7 @@ Works the same in CapCut (desktop), DaVinci Resolve (free), Premiere Pro and Cli
 ### c) Overlays (V2, above your footage)
 - **Lower third:** place `lower-third-alpha.mov` on V2 over Presenter A, starting about 1 s into the clip. It animates in and out by itself (5 s).
   If your editor shows a black box instead of a transparent background (some CapCut versions do), use `lower-third.png` instead, with a 0.3 s fade in and out.
-- **Real demo badge:** `badge-real-demo-alpha.mov` (3 s, animates in and out) at the start of the demo. To keep it on screen for longer, use `badge-real-demo.png` for the whole demo.
+- **Working prototype label:** put `badge-working-prototype-alpha.mov` (4 s) at the very start of the demo. It begins already on screen, exactly where the wristband scene leaves it, so the cut from the green wipe is seamless, then it fades out. To keep the label up for the whole demo, use `badge-working-prototype.png` instead.
 - **Wait shortened badge (only if you cut out waiting time):** place `badge-wait-shortened-alpha.mov` or the `.png` right at the cut point, for about 3 s.
 
 ### d) Audio
@@ -147,7 +147,7 @@ Expect `mean_volume` roughly −30 to −16 dB and `max_volume` near −6 to −
 - [ ] Idea, problem, target users, differentiation (shots 2–3)
 - [ ] Prototype demonstration with real footage (shot 5)
 - [ ] Cost card: estimates still labelled as unverified, or replaced with checked figures (shot 7, see `BUSINESS-ANSWERS.md`)
-- [ ] Future wristband clearly labelled as a concept (shot 6, already built in)
+- [ ] Future wristband clearly labelled as a concept (shot 5, already built in), and the demo labelled "Working laptop-connected prototype" (shot 6)
 - [ ] "Wait shortened" badge used if any waiting was cut
 - [ ] No claims of training Qwen, unlimited ability, web access, autonomous actions, battery life or WHOOP integration
 - [ ] Uniform or national dress requirement followed

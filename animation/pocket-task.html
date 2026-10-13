@@ -117,7 +117,7 @@
   .draft { display: block; width: fit-content; margin-top: 10px; padding: 7px 12px; border-radius: 6px; border: 2px dashed var(--brass-soft); color: var(--brass-soft); font: 700 19px/1 var(--text); letter-spacing: .12em; }
 
   /* Badges / lower third */
-  .badge { display: inline-flex; align-items: center; gap: 22px; padding: 20px 34px 20px 24px; border-radius: 22px; background: rgba(24,58,43,.94); color: var(--cream); box-shadow: 0 12px 34px rgba(0,0,0,.25); }
+  .badge { display: inline-flex; align-items: center; gap: 22px; padding: 20px 34px 20px 24px; border-radius: 22px; background: rgba(24,58,43,.94); color: var(--cream); border: 2px solid rgba(244,238,225,.18); box-shadow: 0 12px 34px rgba(0,0,0,.25); }
   .badge .ico { width: 54px; height: 54px; border-radius: 50%; background: var(--brass); display: flex; align-items: center; justify-content: center; }
   .badge .a { font: 700 34px/1.1 var(--display); }
   .badge .b { font: 500 22px/1.2 var(--text); color: rgba(244,238,225,.75); margin-top: 6px; }
@@ -214,6 +214,8 @@ function pulseArcs(els, t, start, period = .9, on = 1) {
 }
 
 /* ================= SCENES ================= */
+const badgeInner = (title, sub, icon) => `<div class="ico">${icon}</div><div><div class="a">${esc(title)}</div><div class="b">${esc(sub)}</div></div>`;
+const DEMO_ICON = `<svg width="30" height="22" viewBox="0 0 30 22"><rect x="1" y="1" width="20" height="14" rx="2.5" fill="none" stroke="#102A1F" stroke-width="3"/><path d="M0 19 H22" stroke="#102A1F" stroke-width="3" stroke-linecap="round"/><path d="M22 8 H29" stroke="#102A1F" stroke-width="3" stroke-linecap="round"/></svg>`;
 const scenes = {};
 
 /* 1 ─ TITLE */
@@ -558,72 +560,132 @@ scenes.pipeline = {
   }
 };
 
-/* 4 ─ FUTURE DESIGN (wristband concept) */
+/* ---------------------------------------------------------------
+   POCKET TASK WRISTBAND — the ONE shared concept design.
+   Dark navy fabric strap · compact rounded module · one physical
+   button · no screen. Used by every wristband scene and still.
+   Drawn as layered "2.5D": rotating around the vertical axis maps
+   depth z to a sideways shift (x' = x·cos θ + z·sin θ).
+---------------------------------------------------------------- */
+const BAND = { W: 170, MOD: 230, MR: 72, D: 46, BR: 56, BH: 13, SD: 9 };
+const NAVY = { base: "#1F2B47", lite: "#30416A", dark: "#131B2E", edge: "#0E1424", stitch: "#6475A0" };
+const STRAP_TOP = `M -85 -96 L -85 -372 Q -85 -432 -30 -432 L 30 -432 Q 85 -432 85 -372 L 85 -96 Z`;
+const STRAP_BOT = `M -85 96 L -85 384 L 85 384 L 85 96 Z M -78 412 L -78 446 Q -78 456 -68 456 L 68 456 Q 78 456 78 446 L 78 412 Z`;
+const STITCH = `M -71 -110 L -71 -368 Q -71 -418 -28 -418 L 28 -418 Q 71 -418 71 -368 L 71 -110 M -71 110 L -71 372 M 71 110 L 71 372`;
+function bandDefs(id) {
+  return `
+    <pattern id="${id}-weave" width="10" height="10" patternUnits="userSpaceOnUse">
+      <rect width="10" height="10" fill="${NAVY.base}"/>
+      <path d="M0 2.5 H10" stroke="${NAVY.lite}" stroke-width="2.2" opacity=".55"/>
+      <path d="M0 7.5 H10" stroke="${NAVY.dark}" stroke-width="2.2" opacity=".6"/>
+      <path d="M2.5 0 V10 M7.5 0 V10" stroke="${NAVY.lite}" stroke-width="1" opacity=".16"/>
+    </pattern>
+    <linearGradient id="${id}-shade" x1="0" x2="1">
+      <stop offset="0" stop-color="#000" stop-opacity=".42"/><stop offset=".42" stop-color="#fff" stop-opacity=".07"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".46"/>
+    </linearGradient>
+    <linearGradient id="${id}-mod" x1="0" y1="0" x2="1" y2=".35">
+      <stop data-k="${id}-s0" offset="0" stop-color="#173828"/>
+      <stop data-k="${id}-s1" offset=".4" stop-color="#2E6650"/>
+      <stop data-k="${id}-s2" offset=".7" stop-color="#173828"/>
+      <stop offset="1" stop-color="#11301F"/>
+    </linearGradient>
+    <radialGradient id="${id}-btn" cx=".4" cy=".36" r=".8">
+      <stop offset="0" stop-color="#FFFCF4"/><stop offset=".65" stop-color="#F2EADA"/><stop offset="1" stop-color="#D8CBAE"/>
+    </radialGradient>
+    <filter id="${id}-drop" x="-60%" y="-30%" width="220%" height="160%">
+      <feDropShadow dx="0" dy="26" stdDeviation="26" flood-color="#132A20" flood-opacity=".28"/>
+    </filter>`;
+}
+// Layers listed back-to-front. Each <g data-k="bl" data-z=…> is placed by updateBand().
+function bandMarkup(id) {
+  const L = (z, inner) => `<g data-k="bl" data-z="${z}">${inner}</g>`;
+  let s = "";
+  const zs = -BAND.D * .45;                                            // strap sits behind the module face
+  for (let i = 0; i <= 3; i++) s += L(zs - BAND.SD * (1 - i / 3), `<path d="${STRAP_TOP} ${STRAP_BOT}" fill="${NAVY.edge}"/>`);
+  s += L(zs, `<path d="${STRAP_TOP} ${STRAP_BOT}" fill="url(#${id}-weave)"/>
+      <path d="${STRAP_TOP} ${STRAP_BOT}" fill="url(#${id}-shade)"/>
+      <path d="${STITCH}" fill="none" stroke="${NAVY.stitch}" stroke-width="2.4" stroke-dasharray="7 6" stroke-linecap="round" opacity=".85"/>
+      <rect x="-104" y="380" width="208" height="36" rx="18" fill="none" stroke="#B9AD92" stroke-width="9"/>`);
+  const m = BAND.MOD, h = m / 2;
+  for (let i = 0; i < 12; i++) {
+    const k = i / 11, col = `rgb(${Math.round(lerp(9, 20, k))},${Math.round(lerp(26, 48, k))},${Math.round(lerp(18, 34, k))})`;
+    s += L(-BAND.D * (1 - k), `<rect x="${-h}" y="${-h}" width="${m}" height="${m}" rx="${BAND.MR}" fill="${col}"/>`);
+  }
+  s += L(0, `<rect x="${-h}" y="${-h}" width="${m}" height="${m}" rx="${BAND.MR}" fill="url(#${id}-mod)"/>
+      <rect x="${-h + 7}" y="${-h + 7}" width="${m - 14}" height="${m - 14}" rx="${BAND.MR - 6}" fill="none" stroke="#8FAE93" stroke-opacity=".22" stroke-width="2"/>
+      <circle cx="0" cy="0" r="${BAND.BR + 11}" fill="#0F2419"/>
+      <circle cx="0" cy="0" r="${BAND.BR + 11}" fill="none" stroke="#C38F3A" stroke-width="4"/>`);
+  for (let i = 1; i <= 6; i++) s += `<g data-k="bb" data-i="${i}"><circle r="${BAND.BR}" fill="${i < 6 ? "#CDBF9F" : `url(#${id}-btn)`}"/></g>`;
+  return s;
+}
+// θ in degrees, press 0..1 (button travel)
+function updateBand(r, theta, press = 0) {
+  const a = theta * Math.PI / 180, c = Math.cos(a), sn = Math.sin(a);
+  qa(r, "bl").forEach(g => g.setAttribute("transform", `translate(${(+g.dataset.z * sn).toFixed(2)} 0) scale(${c.toFixed(4)} 1)`));
+  const bh = BAND.BH * (1 - .75 * press);
+  qa(r, "bb").forEach(g => g.setAttribute("transform", `translate(${(bh * (+g.dataset.i / 6) * sn).toFixed(2)} 0) scale(${c.toFixed(4)} 1)`));
+  const hl = clamp(.18 + (theta + 40) / 80 * .55, .05, .85);           // highlight sweeps as it turns
+  const st = k => q(r, k);
+  st(r._bid + "-s0").setAttribute("offset", Math.max(0, hl - .32).toFixed(3));
+  st(r._bid + "-s1").setAttribute("offset", hl.toFixed(3));
+  st(r._bid + "-s2").setAttribute("offset", Math.min(1, hl + .3).toFixed(3));
+}
+
+/* 4 ─ FUTURE WRISTBAND CONCEPT → hands off to the real prototype footage */
 scenes.future = {
   dur: 6, bg: "bg-cream",
   html: () => `
-    <div class="abs" data-k="badge" style="left:120px;top:96px;display:flex;align-items:center;gap:14px;padding:14px 26px;border:3px dashed var(--brass);border-radius:40px;background:rgba(195,143,58,.08)">
-      <span style="width:14px;height:14px;border-radius:50%;background:var(--brass)"></span>
-      <span style="font:700 26px/1 var(--text);letter-spacing:.2em;color:#9C6E22">FUTURE DESIGN</span>
-      <span style="font:500 24px/1 var(--text);color:var(--muted)">· concept, not built yet</span>
-    </div>
     <svg class="abs" style="left:0;top:0" width="${W}" height="${H}">
-      <defs>
-        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#2C5E45" stroke-opacity=".08" stroke-width="1.5"/></pattern>
-        <linearGradient id="strap" x1="0" x2="1"><stop offset="0" stop-color="#1F4735"/><stop offset=".5" stop-color="#2C5E45"/><stop offset="1" stop-color="#1F4735"/></linearGradient>
-        <filter id="sh2" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#183A2B" flood-opacity=".22"/></filter>
-      </defs>
-      <rect data-k="grid" x="200" y="230" width="640" height="720" rx="40" fill="url(#grid)"/>
-      <g data-k="band" filter="url(#sh2)">
-        <path d="M 440 250 L 600 250 Q 612 250 612 262 L 618 470 L 422 470 L 428 262 Q 428 250 440 250 Z" fill="url(#strap)"/>
-        <path d="M 422 690 L 618 690 L 612 898 Q 612 910 600 910 L 440 910 Q 428 910 428 898 Z" fill="url(#strap)"/>
-        ${[0,1,2,3].map(i => `<rect x="506" y="${758 + i * 34}" width="28" height="12" rx="6" fill="#102A1F" opacity=".6"/>`).join("")}
-        <rect x="390" y="450" width="260" height="260" rx="72" fill="#183A2B"/>
-        <rect x="402" y="462" width="236" height="236" rx="62" fill="none" stroke="#8FAE93" stroke-opacity=".35" stroke-width="2"/>
+      <defs>${bandDefs("fb")}</defs>
+      <g data-k="cam"><g filter="url(#fb-drop)">${bandMarkup("fb")}</g>
+        <g data-k="rings">${[0, 1].map(() => `<circle data-k="wring" r="70" fill="none" stroke="#C38F3A" stroke-width="5"/>`).join("")}</g>
       </g>
-      <circle data-k="wring" cx="520" cy="580" r="70" fill="none" stroke="#C38F3A" stroke-width="5"/>
-      <circle data-k="wring" cx="520" cy="580" r="70" fill="none" stroke="#C38F3A" stroke-width="5"/>
-      <g data-k="wbtn"><circle cx="520" cy="580" r="64" fill="#F4EEE1"/><circle cx="520" cy="580" r="22" fill="#C38F3A"/></g>
-      <g data-k="warcs">${arcs(660, 580, 3, 36, 30, "#2C5E45", 7, "w-arc", 1, 44)}</g>
-      <!-- blueprint outline drawn first -->
-      <path data-k="outline" pathLength="1" stroke-dasharray="1" fill="none" stroke="#C38F3A" stroke-width="3" stroke-linejoin="round"
-        d="M 440 250 L 600 250 Q 612 250 612 262 L 618 450 Q 650 450 650 522 L 650 638 Q 650 710 618 710 L 612 898 Q 612 910 600 910 L 440 910 Q 428 910 428 898 L 422 710 Q 390 710 390 638 L 390 522 Q 390 450 422 450 L 428 262 Q 428 250 440 250 Z"/>
     </svg>
-    <div class="abs h1" data-k="h" style="left:960px;top:300px;width:820px;font-size:70px">Next: Pocket Task<br>on your wrist.</div>
-    <div class="abs body" data-k="b1" style="left:960px;top:480px;width:780px;font-size:36px;color:var(--green)">A smaller wristband with one button: press, ask, hear the answer.</div>
-    <div class="abs" data-k="b2" style="left:960px;top:650px;width:780px">
-      <div class="eyebrow" style="color:var(--brass)">Still to develop</div>
-      <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:22px">
-        ${["Enclosure", "Switch assembly", "Power system", "Smaller hardware"].map(s => `<span data-k="pill" style="padding:14px 24px;border-radius:30px;border:2px solid var(--cream-3);background:#FBF7EE;font:500 28px/1 var(--text)">${s}</span>`).join("")}
-      </div>
+    <div class="abs" data-k="h" style="left:1060px;top:300px;width:780px;font:700 72px/1.05 var(--display);letter-spacing:-.02em">Next: Pocket Task<br>on your wrist.</div>
+    <div class="abs" data-k="b1" style="left:1060px;top:500px;width:760px;font:500 38px/1.35 var(--text);color:var(--green)">One button. Press, ask,<br>hear the answer.</div>
+    <div class="abs" data-k="b2" style="left:1060px;top:660px;display:flex;align-items:center;gap:16px;padding:20px 28px;border-radius:18px;background:#FBF7EE;border:2px solid var(--cream-3)">
+      <span style="width:14px;height:14px;border-radius:50%;background:var(--brass);flex:none"></span>
+      <span style="font:600 30px/1.3 var(--text);color:var(--green)">Not built yet. Today, the laptop runs the AI.</span>
     </div>
+    <div class="abs" data-k="badge" style="left:72px;top:64px;display:flex;align-items:center;gap:14px;padding:16px 28px;border:3px dashed var(--brass);border-radius:40px;background:#F4EEE1;box-shadow:0 8px 24px rgba(24,58,43,.10)">
+      <span style="width:14px;height:14px;border-radius:50%;background:var(--brass)"></span>
+      <span style="font:700 27px/1 var(--text);letter-spacing:.16em;color:#9C6E22">FUTURE WRISTBAND CONCEPT</span>
+    </div>
+    <div class="abs" data-k="wipe" style="inset:0;background:var(--green-deep)"></div>
+    <div class="abs badge" data-k="chip" style="left:72px;top:64px">${badgeInner(C.demoBadge, C.demoBadgeSub, DEMO_ICON)}</div>
   `,
+  init(r) { r._bid = "fb"; },
   update(r, t) {
-    const out = 5.45, ko = p(t, out, .5, E.inCubic);
-    enter(q(r, "badge"), t, .05, { out, dist: 20 });
-    S(q(r, "grid"), { op: p(t, .1, .8) * (1 - ko) });
-    // blueprint outline draws, then solid band fades in under it
-    const ol = q(r, "outline");
-    draw(ol, p(t, .2, 1.3, E.inOutCubic));
-    ol.style.opacity = ((1 - p(t, 1.6, .6)) * (1 - ko)).toFixed(3);
-    const kb = p(t, 1.15, .8, E.outCubic);
-    S(q(r, "band"), { op: kb * (1 - ko), y: -10 * ko });
-    // button press + rings + sound
-    const press = Math.sin(Math.PI * clamp((t - 2.35) / .3));
-    const kbt = p(t, 1.35, .7, E.outBack);
-    const btn = q(r, "wbtn");
-    btn.style.transformOrigin = "520px 580px";
-    S(btn, { op: p(t, 1.35, .3) * (1 - ko), s: lerp(.6, 1, kbt) * (1 - .08 * press) });
+    // slow rotation the whole time: from a 3/4 view to a gentle front-3/4
+    const theta = lerp(-42, 16, E.inOutSine(clamp(t / 4.9)));
+    const press = Math.sin(Math.PI * clamp((t - 4.55) / .32));
+    updateBand(r, theta, press);
+    // camera: close-up on the button → pull back to the full band on the left
+    const kc = p(t, 2.3, 2.1, E.inOutCubic);
+    const k = lerp(2.55, .93, kc) * lerp(1.06, 1, p(t, 0, 1.2, E.outCubic));
+    const cx = lerp(960, 690, kc), cy = lerp(560, 548, kc);
+    const cam = q(r, "cam");
+    cam.setAttribute("transform", `translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${k.toFixed(4)})`);
+    cam.style.opacity = p(t, 0, .55).toFixed(3);
+    // press rings (in band space, follow the rotation)
+    const c = Math.cos(theta * Math.PI / 180);
     qa(r, "wring").forEach((el, i) => {
-      const k = clamp((t - 2.5 - i * .25) / 1.3), e = E.outCubic(k);
-      el.setAttribute("r", (64 + 120 * e).toFixed(2));
-      el.style.opacity = (k <= 0 || k >= 1 ? 0 : (1 - e) * .7 * (1 - ko)).toFixed(3);
+      const kk = clamp((t - 4.65 - i * .22) / 1.0), e = E.outCubic(kk);
+      el.setAttribute("r", (BAND.BR + 14 + 90 * e).toFixed(2));
+      el.setAttribute("transform", `translate(${(BAND.BH * Math.sin(theta * Math.PI / 180)).toFixed(2)} 0) scale(${c.toFixed(4)} 1)`);
+      el.style.opacity = (kk <= 0 || kk >= 1 ? 0 : (1 - e) * .75).toFixed(3);
     });
-    pulseArcs(qa(r, "w-arc"), t, 2.9, .85, 1 - ko);
-    enter(q(r, "h"), t, .45, { out, dist: 44 });
-    enter(q(r, "b1"), t, .75, { out });
-    enter(q(r, "b2"), t, 1.15, { out });
-    qa(r, "pill").forEach((el, i) => enter(el, t, 1.35 + i * .12, { d: .6, dist: 18, blur: 3 }));
+    // label always visible while the band is on screen
+    enter(q(r, "badge"), t, .1, { d: .6, dist: -16, blur: 3 });
+    enter(q(r, "h"), t, 3.75, { d: .8, dist: 40 });
+    enter(q(r, "b1"), t, 4.0, { d: .7 });
+    enter(q(r, "b2"), t, 4.2, { d: .7, dist: 24 });
+    // hand-off: deep-green wipe, then the prototype label lands where the footage overlay sits
+    const kw = p(t, 5.2, .55, E.inOutCubic);
+    q(r, "wipe").style.clipPath = `inset(0 0 0 ${(100 * (1 - kw)).toFixed(2)}%)`;
+    const kchip = p(t, 5.5, .5, E.outQuart);
+    S(q(r, "chip"), { op: kchip, x: -30 * (1 - kchip), b: 4 * (1 - kchip) });
   }
 };
 
@@ -721,19 +783,18 @@ scenes.lowerthird = {
     enter(q(r, "sub"), t, .6, { d: .6, dist: 20, blur: 4, out: out - .15, dOut: .3 });
   }
 };
-function badgeScene(title, sub, icon) {
+function badgeScene(title, sub, icon, { dur = 3, startVisible = false } = {}) {
   return {
-    dur: 3, transparent: true,
-    html: () => `<div class="abs badge" data-k="b" style="left:72px;top:64px">
-      <div class="ico">${icon}</div><div><div class="a">${esc(title)}</div><div class="b">${esc(sub)}</div></div></div>`,
+    dur, transparent: true,
+    html: () => `<div class="abs badge" data-k="b" style="left:72px;top:64px">${badgeInner(title, sub, icon)}</div>`,
     update(r, t) {
-      const k = p(t, .05, .6, E.outQuart), ko = p(t, 2.5, .45, E.inCubic);
+      const k = startVisible ? 1 : p(t, .05, .6, E.outQuart), ko = p(t, dur - .5, .45, E.inCubic);
       S(q(r, "b"), { op: k * (1 - ko), x: -30 * (1 - k), b: 4 * (1 - k) });
     }
   };
 }
-scenes["badge-demo"] = badgeScene(C.demoBadge, C.demoBadgeSub,
-  `<svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="9" fill="#102A1F"/></svg>`);
+// starts fully visible so it continues the label from the end of the wristband scene
+scenes["badge-demo"] = badgeScene(C.demoBadge, C.demoBadgeSub, DEMO_ICON, { dur: 4, startVisible: true });
 scenes["badge-shortened"] = badgeScene(C.shortenedBadge, C.shortenedBadgeSub,
   `<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="#102A1F" stroke-width="3.5"/><path d="M15 8 V15 L20 18" fill="none" stroke="#102A1F" stroke-width="3.5" stroke-linecap="round"/></svg>`);
 

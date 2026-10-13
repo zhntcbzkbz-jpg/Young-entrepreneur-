@@ -13,12 +13,12 @@ window.PT_TIMELINE = [
   },
   { id: "why", type: "anim", dur: 6 },
   { id: "pipeline", type: "anim", dur: 12 },
+  { id: "future", type: "anim", dur: 6 },
   {
     id: "slot-b", type: "slot", dur: 20,
-    label: "Real demo clip — wires → question → answer",
+    label: "Real demo clip — Working laptop-connected prototype",
     say: "Real footage only: wires touch, ask your genuine question, review the transcript, hear the spoken answer. Label any shortened wait."
   },
-  { id: "future", type: "anim", dur: 6 },
   { id: "cost", type: "anim", dur: 7 },
   {
     id: "slot-c", type: "slot", dur: 8,
