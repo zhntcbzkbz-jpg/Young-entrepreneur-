@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pocket Task Animation</title>
+<!--
+  POCKET TASK — ANIMATION SOURCE
+  Open this file in Chrome/Edge to preview. Edit text in content.js,
+  scene order/durations in timeline.js. Render MP4s with render.mjs.
+  Every frame is a pure function of time, so renders are perfectly smooth
+  and identical every time.
+-->
+<style>
+  @font-face { font-family: "PT Display"; src: url("assets/fonts/InterDisplay-Bold.otf"); font-weight: 700; }
+  @font-face { font-family: "PT Display"; src: url("assets/fonts/InterDisplay-SemiBold.otf"); font-weight: 600; }
+  @font-face { font-family: "PT Text"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; }
+  @font-face { font-family: "PT Text"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; }
+  @font-face { font-family: "PT Text"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; }
+  @font-face { font-family: "PT Text"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; }
+
+  :root {
+    --cream: #F4EEE1;
+    --cream-2: #EAE1CD;
+    --cream-3: #DCD0B6;
+    --green: #183A2B;
+    --green-deep: #102A1F;
+    --green-2: #2C5E45;
+    --sage: #8FAE93;
+    --muted: #5C6F63;
+    --brass: #C38F3A;
+    --brass-soft: #E9D2A6;
+    --display: "PT Display", "Inter Display", "Segoe UI", system-ui, sans-serif;
+    --text: "PT Text", "Inter", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #0d1a14; height: 100%; overflow: hidden; font-family: var(--text); }
+
+  #viewport { position: absolute; inset: 0 0 64px 0; display: flex; align-items: center; justify-content: center; }
+  #stage {
+    position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;
+    transform-origin: 0 0; overflow: hidden; background: var(--cream); color: var(--green);
+  }
+  body.render #viewport { inset: 0; }
+  body.render #controls { display: none; }
+  html.transparent, html.transparent body, html.transparent #stage { background: transparent !important; }
+  html.transparent .scene { background: transparent !important; }
+
+  .scene { position: absolute; inset: 0; display: none; overflow: hidden; }
+  .scene.active { display: block; }
+  .abs { position: absolute; will-change: transform, opacity; }
+  .bg-cream { background: radial-gradient(ellipse 120% 90% at 50% 40%, #F8F3E8 0%, var(--cream) 55%, #ECE4D3 100%); }
+  .bg-green { background: radial-gradient(ellipse 120% 90% at 50% 40%, #1F4735 0%, var(--green) 55%, #0F271C 100%); color: var(--cream); }
+
+  .eyebrow { font: 600 22px/1 var(--text); letter-spacing: .22em; text-transform: uppercase; color: var(--green-2); }
+  .h1 { font: 700 64px/1.05 var(--display); letter-spacing: -.02em; }
+  .h2 { font: 700 44px/1.1 var(--display); letter-spacing: -.015em; }
+  .body { font: 400 32px/1.35 var(--text); color: var(--muted); }
+
+  /* Title */
+  .wordmark { font: 700 150px/1 var(--display); letter-spacing: -.035em; white-space: nowrap; }
+  .wordmark span { display: inline-block; will-change: transform, opacity; }
+  .center-x { left: 0; right: 0; text-align: center; }
+
+  /* Cards */
+  .card { border-radius: 28px; padding: 44px 44px 40px; }
+  .card .num { font: 600 22px/1 var(--text); letter-spacing: .18em; color: var(--brass); }
+  .card .title { font: 700 42px/1.1 var(--display); margin: 26px 0 16px; letter-spacing: -.01em; }
+  .card .txt { font: 400 31px/1.38 var(--text); }
+
+  /* Caption bar */
+  .caption {
+    left: 50%; top: 908px; height: 100px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 24px; padding: 0 44px 0 22px;
+    background: var(--green); color: var(--cream); border-radius: 50px; white-space: nowrap;
+    font: 600 40px/1 var(--text); box-shadow: 0 14px 40px rgba(16,42,31,.18);
+  }
+  .caption .n {
+    width: 62px; height: 62px; border-radius: 50%; background: var(--brass); color: var(--green-deep);
+    display: flex; align-items: center; justify-content: center; font: 700 32px/1 var(--display);
+  }
+  .caption .t { position: relative; height: 48px; overflow: visible; }
+  .caption .t div { position: absolute; left: 0; top: 4px; white-space: nowrap; }
+
+  /* Laptop screen UI */
+  .screen { left: 954px; top: 274px; width: 792px; height: 472px; color: var(--cream); overflow: hidden; border-radius: 10px; }
+  .screen .bar { height: 50px; display: flex; align-items: center; gap: 9px; padding: 0 20px; background: rgba(244,238,225,.06); font: 500 19px/1 var(--text); color: rgba(244,238,225,.7); }
+  .screen .bar i { width: 11px; height: 11px; border-radius: 50%; background: rgba(244,238,225,.25); display: inline-block; }
+  .screen .bar b { margin-left: 10px; font-weight: 600; color: rgba(244,238,225,.85); }
+  .stages { position: absolute; left: 16px; top: 66px; width: 300px; }
+  .stg { position: relative; height: 92px; border-radius: 14px; padding: 18px 16px 0 66px; margin-bottom: 8px; }
+  .stg .hl { position: absolute; inset: 0; border-radius: 14px; background: rgba(244,238,225,.10); }
+  .stg .acc { position: absolute; left: 0; top: 16px; bottom: 16px; width: 5px; border-radius: 3px; background: var(--brass); }
+  .stg .ic { position: absolute; left: 16px; top: 22px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(244,238,225,.35); display:flex; align-items:center; justify-content:center; font: 700 17px/1 var(--display); color: rgba(244,238,225,.7); }
+  .stg .ic.done { background: var(--sage); border-color: var(--sage); color: var(--green-deep); }
+  .stg .a { font: 600 25px/1.1 var(--text); }
+  .stg .b { font: 400 17px/1.2 var(--text); color: rgba(244,238,225,.6); margin-top: 7px; }
+  .panel { position: absolute; left: 336px; top: 66px; width: 436px; height: 390px; border-radius: 16px; background: rgba(0,0,0,.18); }
+  .panel .pv { position: absolute; inset: 0; padding: 26px 28px; }
+  .panel .lbl { font: 600 16px/1 var(--text); letter-spacing: .16em; text-transform: uppercase; color: var(--brass-soft); }
+  .panel .q { font: 500 32px/1.3 var(--text); margin-top: 22px; color: var(--cream); }
+  .panel .ans { font: 500 27px/1.38 var(--text); margin-top: 20px; }
+  .panel .ans span { will-change: opacity; }
+  .chip { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 30px; font: 600 18px/1 var(--text); }
+  .note { font: 400 16px/1.2 var(--text); color: rgba(244,238,225,.45); position: absolute; left: 28px; bottom: 22px; }
+
+  /* Cost card */
+  .field-row { display: flex; align-items: center; justify-content: space-between; gap: 28px; height: 104px; border-bottom: 2px solid var(--cream-3); }
+  .field-row:last-child { border-bottom: none; }
+  .field-row .l { font: 500 31px/1.2 var(--text); color: var(--green); }
+  .field-row .v { min-width: 270px; height: 66px; border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 0 24px; font: 700 32px/1 var(--display); }
+  .v.filled { background: var(--green); color: var(--cream); }
+  .v.empty { border: 3px dashed var(--brass); color: var(--brass); font: 700 22px/1 var(--text); letter-spacing: .14em; background: rgba(195,143,58,.07); }
+  .mk { display: flex; align-items: flex-start; gap: 22px; margin-bottom: 26px; }
+  .mk .dot { flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--brass); margin-top: 12px; }
+  .mk .tx { font: 500 33px/1.32 var(--text); color: var(--cream); }
+  .draft { display: block; width: fit-content; margin-top: 10px; padding: 6px 10px; border-radius: 6px; border: 2px dashed var(--brass-soft); color: var(--brass-soft); font: 700 15px/1 var(--text); letter-spacing: .14em; }
+
+  /* Badges / lower third */
+  .badge { display: inline-flex; align-items: center; gap: 22px; padding: 20px 34px 20px 24px; border-radius: 22px; background: rgba(24,58,43,.94); color: var(--cream); box-shadow: 0 12px 34px rgba(0,0,0,.25); }
+  .badge .ico { width: 54px; height: 54px; border-radius: 50%; background: var(--brass); display: flex; align-items: center; justify-content: center; }
+  .badge .a { font: 700 34px/1.1 var(--display); }
+  .badge .b { font: 500 22px/1.2 var(--text); color: rgba(244,238,225,.75); margin-top: 6px; }
+
+  /* Slot (placeholder) */
+  .slot { background: #1d2a24; color: var(--cream); }
+  .slot .frame { position: absolute; inset: 60px; border: 4px dashed rgba(244,238,225,.35); border-radius: 30px; }
+
+  /* Preview controls */
+  #controls { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 18px; background: #0d1a14; color: #F4EEE1; font: 500 15px var(--text); }
+  #controls select, #controls button { font: 600 15px var(--text); background: #1F4735; color: #F4EEE1; border: 1px solid #3c6b55; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+  #controls input[type=range] { flex: 1; accent-color: #C38F3A; }
+  #controls .time { min-width: 120px; text-align: right; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage"></div></div>
+<div id="controls">
+  <select id="sceneSel"></select>
+  <button id="playBtn">Pause</button>
+  <input id="scrub" type="range" min="0" max="1000" value="0">
+  <span class="time" id="timeLbl">0.00 s</span>
+</div>
+
+<script src="content.js"></script>
+<script src="timeline.js"></script>
+<script>
+(() => {
+const C = window.PT_CONTENT;
+const W = 1920, H = 1080;
+
+/* ---------------- motion helpers ---------------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const E = {
+  lin: x => x,
+  outCubic: x => 1 - Math.pow(1 - x, 3),
+  outQuart: x => 1 - Math.pow(1 - x, 4),
+  outQuint: x => 1 - Math.pow(1 - x, 5),
+  inCubic: x => x * x * x,
+  inOutCubic: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  inOutSine: x => -(Math.cos(Math.PI * x) - 1) / 2,
+  outBack: x => { const c1 = 1.25, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+};
+// progress of an animation that starts at `a` and lasts `d` seconds
+const p = (t, a, d, e = E.outCubic) => e(clamp((t - a) / d));
+
+function S(el, o = {}) {
+  if (!el) return;
+  const { op, x = 0, y = 0, s = 1, sx, sy, r = 0, b = 0 } = o;
+  if (op !== undefined) el.style.opacity = clamp(op).toFixed(4);
+  const scl = (sx !== undefined || sy !== undefined) ? `scale(${sx ?? s},${sy ?? s})` : `scale(${s})`;
+  el.style.transform = `translate(${x.toFixed(2)}px,${y.toFixed(2)}px) ${scl} rotate(${r}deg)`;
+  el.style.filter = b > 0.05 ? `blur(${b.toFixed(2)}px)` : "none";
+}
+// Standard element entrance + exit: soft rise with a touch of blur.
+function enter(el, t, a, opt = {}) {
+  const { d = .8, dist = 36, out = null, dOut = .45, outDist = -18, blur = 6, ease = E.outQuart, sFrom = 1 } = opt;
+  const k = p(t, a, d, ease);
+  const ko = out == null ? 0 : p(t, out, dOut, E.inCubic);
+  S(el, { op: k * (1 - ko), y: dist * (1 - k) + outDist * ko, b: blur * (1 - k) + blur * .6 * ko, s: lerp(sFrom, 1, k) });
+  return k * (1 - ko);
+}
+const q = (root, k) => root.querySelector(`[data-k="${k}"]`);
+const qa = (root, k) => [...root.querySelectorAll(`[data-k="${k}"]`)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const draw = (el, k) => { if (el) el.style.strokeDashoffset = (1 - clamp(k)).toFixed(4); };
+
+/* --------------- shared graphics --------------- */
+// Pocket Task mark: rounded square with a big round button + sound arcs
+function markSVG(size, bg, fg, acc) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 200 200" style="overflow:visible">
+    <rect data-k="m-sq" x="10" y="10" width="180" height="180" rx="52" fill="${bg}"/>
+    <circle data-k="m-btn" cx="100" cy="100" r="46" fill="${fg}"/>
+    <circle data-k="m-dot" cx="100" cy="100" r="15" fill="${acc}"/>
+  </svg>`;
+}
+function arcs(cx, cy, n, r0, gap, color, sw, k, dir = 1, spread = 46) {
+  let s = "";
+  for (let i = 0; i < n; i++) {
+    const r = r0 + i * gap, a = spread * Math.PI / 180;
+    const x1 = cx + dir * r * Math.cos(a), y1 = cy - r * Math.sin(a), y2 = cy + r * Math.sin(a);
+    s += `<path data-k="${k}" d="M ${x1} ${y1} A ${r} ${r} 0 0 ${dir > 0 ? 1 : 0} ${x1} ${y2}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  }
+  return s;
+}
+// pulse animation for a set of arcs: wave travels outward, repeating
+function pulseArcs(els, t, start, period = .9, on = 1) {
+  els.forEach((el, i) => {
+    const ph = ((t - start) / period - i * .18);
+    const w = ph < 0 ? 0 : Math.sin(Math.PI * clamp(ph - Math.floor(ph)));
+    el.style.opacity = (t < start ? 0 : (.25 + .75 * w) * on).toFixed(3);
+  });
+}
+
+/* ================= SCENES ================= */
+const scenes = {};
+
+/* 1 ─ TITLE */
+scenes.title = {
+  dur: 5, bg: "bg-cream",
+  html: () => `
+    <svg class="abs" style="left:0;top:0" width="${W}" height="${H}">
+      <circle data-k="ring" cx="960" cy="360" r="120" fill="none" stroke="#2C5E45" stroke-width="3"/>
+      <circle data-k="ring" cx="960" cy="360" r="120" fill="none" stroke="#2C5E45" stroke-width="3"/>
+      <circle data-k="ring" cx="960" cy="360" r="120" fill="none" stroke="#2C5E45" stroke-width="3"/>
+    </svg>
+    <div class="abs" data-k="mark" style="left:870px;top:270px;width:180px;height:180px">${markSVG(180, "#183A2B", "#F4EEE1", "#C38F3A")}</div>
+    <div class="abs center-x wordmark" data-k="word" style="top:500px">${[...C.projectName].map(ch => `<span>${ch === " " ? "&nbsp;" : esc(ch)}</span>`).join("")}</div>
+    <div class="abs center-x" data-k="tag" style="top:676px;font:500 44px/1 var(--text);color:var(--green-2)">${esc(C.tagline)}</div>
+    <div class="abs" data-k="rule" style="left:810px;top:792px;width:300px;height:3px;background:var(--brass);transform-origin:50% 50%"></div>
+    <div class="abs center-x" data-k="cred" style="top:830px;font:600 34px/1.3 var(--text)">${esc(C.student)}<span style="color:var(--brass)"> · </span><span style="font-weight:500;color:var(--muted)">${esc(C.details)}</span></div>
+    <div class="abs center-x" data-k="event" style="top:884px;font:500 26px/1.3 var(--text);color:var(--muted);letter-spacing:.04em">${esc(C.event)}${C.team ? " · " + esc(C.team) : ""}</div>
+  `,
+  update(r, t) {
+    const out = 4.45;
+    const ko = p(t, out, .5, E.inCubic);
+    // mark pops in with gentle overshoot, then the button "presses"
+    const km = p(t, .1, .75, E.outBack);
+    const press = Math.sin(Math.PI * clamp((t - 1.0) / .28)) * .08;
+    S(q(r, "mark"), { op: p(t, .1, .35) * (1 - ko), s: (.55 + .45 * km) * (1 - press) * (1 - .06 * ko), y: -14 * ko });
+    // rings radiate after the press
+    qa(r, "ring").forEach((el, i) => {
+      const k = clamp((t - 1.05 - i * .22) / 1.6);
+      const e = E.outCubic(k);
+      el.setAttribute("r", (95 + 210 * e).toFixed(2));
+      el.style.opacity = (k <= 0 || k >= 1 ? 0 : (1 - e) * .55 * (1 - ko)).toFixed(3);
+    });
+    // wordmark letters rise with stagger
+    [...q(r, "word").children].forEach((sp, i) => {
+      const k = p(t, .55 + i * .045, .8, E.outQuart);
+      S(sp, { op: k * (1 - ko), y: 70 * (1 - k) - 16 * ko, b: 10 * (1 - k) + 4 * ko });
+    });
+    enter(q(r, "tag"), t, 1.25, { out: out + .05 });
+    const kr = p(t, 1.65, .9, E.inOutCubic);
+    S(q(r, "rule"), { op: (1 - ko), sx: kr, sy: 1 });
+    enter(q(r, "cred"), t, 1.9, { out: out + .1 });
+    enter(q(r, "event"), t, 2.1, { out: out + .12 });
+  }
+};
+
+/* 2 ─ WHY (problem / users / difference) */
+const whyIcons = [
+  // phone with app grid
+  `<svg width="76" height="76" viewBox="0 0 76 76"><rect x="18" y="4" width="40" height="68" rx="9" fill="none" stroke="#183A2B" stroke-width="4"/>
+   ${[0,1,2].map(r=>[0,1].map(c=>`<rect x="${26+c*14}" y="${15+r*14}" width="10" height="10" rx="3" fill="#C38F3A"/>`).join("")).join("")}
+   <rect x="31" y="60" width="14" height="4" rx="2" fill="#183A2B"/></svg>`,
+  // person / student
+  `<svg width="76" height="76" viewBox="0 0 76 76"><path d="M14 26 L38 15 L62 26 L38 37 Z" fill="#C38F3A"/><path d="M24 31 v10 c0 6 28 6 28 0 v-10" fill="none" stroke="#183A2B" stroke-width="4"/>
+   <circle cx="38" cy="50" r="0" /><path d="M20 70 c3-10 33-10 36 0" fill="none" stroke="#183A2B" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="50" r="8" fill="none" stroke="#183A2B" stroke-width="4"/></svg>`,
+  // button + sound
+  `<svg width="76" height="76" viewBox="0 0 76 76"><circle cx="30" cy="38" r="20" fill="#183A2B"/><circle cx="30" cy="38" r="7" fill="#C38F3A"/>
+   <path d="M56 26 a16 16 0 0 1 0 24" fill="none" stroke="#183A2B" stroke-width="4" stroke-linecap="round"/><path d="M65 18 a28 28 0 0 1 0 40" fill="none" stroke="#183A2B" stroke-width="4" stroke-linecap="round"/></svg>`
+];
+scenes.why = {
+  dur: 6, bg: "bg-cream",
+  html: () => `
+    <div class="abs eyebrow" data-k="eb" style="left:150px;top:130px">The idea</div>
+    <div class="abs h1" data-k="h" style="left:150px;top:170px">A question shouldn't need five taps.</div>
+    ${C.why.map((c, i) => `
+      <div class="abs card" data-k="card" style="left:${150 + i * 556}px;top:350px;width:516px;height:440px;
+        background:${i === 2 ? "var(--green)" : "#FBF7EE"};color:${i === 2 ? "var(--cream)" : "var(--green)"};
+        box-shadow:0 18px 50px rgba(24,58,43,${i === 2 ? .22 : .08});${i === 2 ? "" : "border:2px solid var(--cream-2);"}">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="num" style="${i === 2 ? "color:var(--brass-soft)" : ""}">0${i + 1}</div>
+          <div data-k="ico" style="width:76px;height:76px;border-radius:22px;${i === 2 ? "background:var(--cream);" : ""}display:flex;align-items:center;justify-content:center">${whyIcons[i]}</div>
+        </div>
+        <div class="title">${esc(c.title)}</div>
+        <div class="txt" style="color:${i === 2 ? "rgba(244,238,225,.85)" : "var(--muted)"}">${esc(c.body)}</div>
+      </div>`).join("")}
+  `,
+  update(r, t) {
+    const out = 5.4;
+    enter(q(r, "eb"), t, .05, { out });
+    enter(q(r, "h"), t, .15, { out, dist: 44 });
+    qa(r, "card").forEach((el, i) => {
+      const k = p(t, .55 + i * .2, .95, E.outQuint);
+      const ko = p(t, out + i * .05, .45, E.inCubic);
+      S(el, { op: k * (1 - ko), y: 90 * (1 - k) - 20 * ko, s: lerp(.96, 1, k), b: 6 * (1 - k) });
+    });
+    qa(r, "ico").forEach((el, i) => {
+      const k = p(t, 1.0 + i * .2, .7, E.outBack);
+      S(el, { op: k, s: lerp(.6, 1, k), r: lerp(-10, 0, k) });
+    });
+  }
+};
+
+/* 3 ─ PIPELINE (trigger → Arduino/USB → laptop: STT → local AI → speech) */
+const STEPS = [
+  { n: 1, a: 2.0, txt: "Touch the two wires together to start" },
+  { n: 2, a: 3.65, txt: "The Arduino signals the laptop over USB" },
+  { n: 3, a: 4.9, txt: "Ask aloud — the laptop microphone records" },
+  { n: 4, a: 6.2, txt: "whisper.cpp turns speech into text" },
+  { n: 5, a: 7.55, txt: "Qwen3.5 (0.8B) answers, locally on the laptop" },
+  { n: 6, a: 9.6, txt: "The laptop speaks the answer out loud" },
+];
+const wireA = dy => `M 432 522 C 340 522, 250 480, 250 ${548 + dy}`;
+const wireB = dy => `M 432 600 C 340 600, 250 652, 250 ${612 - dy}`;
+scenes.pipeline = {
+  dur: 12, bg: "bg-cream",
+  html: () => `
+    <div class="abs eyebrow" data-k="eb" style="left:120px;top:84px">How the prototype works</div>
+    <div class="abs h1" data-k="h" style="left:120px;top:122px;font-size:58px">One trigger. One question. One spoken answer.</div>
+
+    <svg class="abs" style="left:0;top:0" width="${W}" height="${H}">
+      <defs>
+        <radialGradient id="glow"><stop offset="0" stop-color="#F6D48C" stop-opacity="1"/><stop offset="1" stop-color="#F6D48C" stop-opacity="0"/></radialGradient>
+        <filter id="soft" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#183A2B" flood-opacity=".16"/></filter>
+      </defs>
+
+      <!-- laptop (the host) -->
+      <g data-k="laptop">
+        <ellipse cx="1355" cy="812" rx="520" ry="22" fill="#183A2B" opacity=".10"/>
+        <rect x="930" y="250" width="840" height="520" rx="28" fill="#0F2419" filter="url(#soft)"/>
+        <rect x="954" y="274" width="792" height="472" rx="10" fill="#183A2B"/>
+        <circle cx="1350" cy="262" r="4" fill="#3E5A4C"/>
+        <path d="M 868 770 L 1832 770 L 1812 800 Q 1806 806 1796 806 L 904 806 Q 894 806 888 800 Z" fill="#CFC3A8"/>
+        <rect x="1290" y="770" width="120" height="10" rx="5" fill="#B8AB8F"/>
+      </g>
+      <g data-k="spk">${arcs(1798, 510, 3, 30, 26, "#2C5E45", 6, "spk-arc", 1, 42)}</g>
+
+      <!-- USB cable -->
+      <path data-k="usb" d="M 738 560 C 830 560, 820 690, 930 690" pathLength="1" stroke-dasharray="1" fill="none" stroke="#183A2B" stroke-width="10" stroke-linecap="round"/>
+      <rect data-k="usb-plug" x="910" y="680" width="26" height="20" rx="4" fill="#0F2419"/>
+      <circle data-k="pulse" r="14" fill="#C38F3A"/>
+      <circle data-k="pulse-glow" r="34" fill="url(#glow)"/>
+
+      <!-- Arduino Uno -->
+      <g data-k="ard">
+        <rect x="432" y="470" width="300" height="200" rx="16" fill="#2C5E45" filter="url(#soft)"/>
+        <rect x="432" y="470" width="300" height="200" rx="16" fill="none" stroke="#8FAE93" stroke-width="2" opacity=".6"/>
+        ${Array.from({ length: 10 }, (_, i) => `<rect x="${470 + i * 22}" y="484" width="12" height="12" rx="2" fill="#0F2419"/>`).join("")}
+        ${Array.from({ length: 8 }, (_, i) => `<rect x="${492 + i * 22}" y="644" width="12" height="12" rx="2" fill="#0F2419"/>`).join("")}
+        <rect x="540" y="540" width="120" height="44" rx="5" fill="#0F2419"/>
+        ${Array.from({ length: 6 }, (_, i) => `<rect x="${548 + i * 19}" y="534" width="6" height="6" fill="#8FAE93"/><rect x="${548 + i * 19}" y="584" width="6" height="6" fill="#8FAE93"/>`).join("")}
+        <rect x="700" y="540" width="44" height="40" rx="5" fill="#B8AB8F"/>
+        <rect x="420" y="510" width="16" height="24" rx="3" fill="#0F2419"/>
+        <rect x="420" y="588" width="16" height="24" rx="3" fill="#0F2419"/>
+        <circle data-k="led" cx="470" cy="620" r="8" fill="#C38F3A"/>
+      </g>
+
+      <!-- jumper wires (temporary button) -->
+      <g data-k="wires">
+        <path data-k="wa" d="${wireA(0)}" fill="none" stroke="#C38F3A" stroke-width="10" stroke-linecap="round"/>
+        <path data-k="wb" d="${wireB(0)}" fill="none" stroke="#7FA287" stroke-width="10" stroke-linecap="round"/>
+        <rect data-k="pa" x="244" y="546" width="12" height="24" rx="2" fill="#7D8A84"/>
+        <rect data-k="pb" x="244" y="590" width="12" height="24" rx="2" fill="#7D8A84"/>
+      </g>
+      <circle data-k="spark-glow" cx="250" cy="580" r="70" fill="url(#glow)"/>
+      <g data-k="spark">${Array.from({ length: 8 }, (_, i) => {
+        const a = i * Math.PI / 4;
+        return `<line x1="${250 + Math.cos(a) * 22}" y1="${580 + Math.sin(a) * 22}" x2="${250 + Math.cos(a) * 44}" y2="${580 + Math.sin(a) * 44}" stroke="#C38F3A" stroke-width="5" stroke-linecap="round"/>`;
+      }).join("")}</g>
+
+      <!-- question bubble -->
+      <g data-k="bubble">
+        <rect x="380" y="292" width="480" height="96" rx="48" fill="#FBF7EE" stroke="#DCD0B6" stroke-width="2"/>
+        <text x="620" y="352" text-anchor="middle" style="font:500 32px var(--text)" fill="#183A2B">“${esc(C.sampleQuestion)}”</text>
+      </g>
+      <g data-k="qarcs">${arcs(872, 340, 3, 16, 16, "#2C5E45", 5, "q-arc", 1, 40)}</g>
+    </svg>
+
+    <div class="abs" data-k="lbl-trig" style="left:118px;top:690px;width:264px;text-align:center;font:600 24px/1.25 var(--text)">Temporary trigger<div style="font-weight:400;color:var(--muted);font-size:21px;margin-top:4px">two jumper wires</div></div>
+    <div class="abs" data-k="lbl-ard" style="left:432px;top:690px;width:300px;text-align:center;font:600 24px/1.25 var(--text)">Arduino Uno R3<div style="font-weight:400;color:var(--muted);font-size:21px;margin-top:4px">controller only, via USB</div></div>
+    <div class="abs" data-k="lbl-lap" style="left:930px;top:826px;width:840px;text-align:center;font:600 24px/1.25 var(--text)">Laptop = the host <span style="font-weight:400;color:var(--muted)">· microphone · AI · speaker</span></div>
+
+    <div class="abs screen" data-k="screen">
+      <div class="bar"><i></i><i></i><i></i><b>Pocket Task</b><span style="margin-left:auto">local app</span></div>
+      <div class="stages">
+        ${[["Listen", "laptop microphone"], ["Transcribe", "whisper.cpp · English base"], ["Answer", "Qwen3.5 0.8B · local"], ["Speak", "local text-to-speech"]].map((s, i) => `
+          <div class="stg" data-k="stg"><div class="hl"></div><div class="acc"></div><div class="ic">${i + 1}</div><div class="a">${s[0]}</div><div class="b">${s[1]}</div></div>`).join("")}
+      </div>
+      <div class="panel">
+        <div class="pv" data-k="pv-wait"><div class="lbl">Ready</div><div class="q" style="color:rgba(244,238,225,.6)">Waiting for the trigger…</div></div>
+        <div class="pv" data-k="pv-rec">
+          <div class="lbl" style="display:flex;align-items:center;gap:10px"><span data-k="recdot" style="width:14px;height:14px;border-radius:50%;background:#E0745A;display:inline-block"></span>Recording</div>
+          <svg width="380" height="200" style="margin-top:40px">${Array.from({ length: 26 }, (_, i) => `<rect data-k="wv" x="${i * 14.6}" y="100" width="8" height="2" rx="4" fill="#F4EEE1"/>`).join("")}</svg>
+        </div>
+        <div class="pv" data-k="pv-txt">
+          <div class="lbl">Transcript · review first</div>
+          <div class="q" data-k="typed"></div>
+          <div class="chip" data-k="send" style="position:absolute;left:28px;bottom:66px;background:var(--brass);color:var(--green-deep)">✓ Send</div>
+        </div>
+        <div class="pv" data-k="pv-ans">
+          <div class="lbl">Answer</div>
+          <div data-k="think" style="display:flex;gap:12px;margin-top:34px">${[0,1,2].map(() => `<i data-k="td" style="width:16px;height:16px;border-radius:50%;background:var(--cream);display:block"></i>`).join("")}</div>
+          <div class="ans" data-k="ans" style="position:absolute;left:28px;right:28px;top:44px">${C.sampleAnswer.split(" ").map(w => `<span>${esc(w)} </span>`).join("")}</div>
+          <div class="chip" data-k="speaking" style="position:absolute;left:28px;bottom:58px;background:rgba(244,238,225,.12);color:var(--cream)">
+            <svg width="30" height="22" viewBox="0 0 30 22">${[0,1,2,3,4].map(i => `<rect data-k="sb" x="${i * 6.5}" y="3" width="4" height="16" rx="2" fill="#F4EEE1"/>`).join("")}</svg>Speaking…</div>
+        </div>
+        <div class="note">Illustrative example</div>
+      </div>
+    </div>
+
+    <div class="abs caption" data-k="cap"><div class="n" data-k="capn">1</div><div class="t" data-k="capt">${STEPS.map(s => `<div data-k="capi">${esc(s.txt)}</div>`).join("")}</div></div>
+  `,
+  init(r) {
+    // size caption text box to the longest caption so the pill width animates smoothly
+    const items = qa(r, "capi");
+    r._capW = items.map(el => el.getBoundingClientRect().width / (r._scale || 1));
+  },
+  update(r, t) {
+    const out = 11.45, ko = p(t, out, .5, E.inCubic);
+    enter(q(r, "eb"), t, .0, { out });
+    enter(q(r, "h"), t, .1, { out, dist: 40 });
+
+    // laptop + screen
+    const kl = p(t, .35, 1.0, E.outQuint);
+    S(q(r, "laptop"), { op: kl * (1 - ko), y: 60 * (1 - kl), s: lerp(.97, 1, kl) });
+    const ks = p(t, .9, .7);
+    S(q(r, "screen"), { op: ks * (1 - ko), y: 60 * (1 - kl) });
+    enter(q(r, "lbl-lap"), t, 1.2, { out });
+
+    // arduino + wires
+    const ka = p(t, .8, .9, E.outQuint);
+    S(q(r, "ard"), { op: ka * (1 - ko), y: 40 * (1 - ka) });
+    const kw = p(t, 1.1, .9, E.outQuint);
+    S(q(r, "wires"), { op: kw * (1 - ko), x: -30 * (1 - kw) });
+    enter(q(r, "lbl-trig"), t, 1.35, { out });
+    enter(q(r, "lbl-ard"), t, 1.45, { out });
+
+    // STEP 1: wires join
+    const kj = p(t, 2.25, .55, E.inOutCubic);
+    const sep = p(t, 4.6, .5, E.inOutCubic);              // wires released after recording starts
+    const dy = 12 * kj * (1 - sep);
+    q(r, "wa").setAttribute("d", wireA(dy));
+    q(r, "wb").setAttribute("d", wireB(dy));
+    q(r, "pa").setAttribute("y", 546 + dy);
+    q(r, "pb").setAttribute("y", 590 - dy);
+    const sk = clamp((t - 2.78) / .7);
+    const spark = sk > 0 && sk < 1 ? Math.sin(Math.PI * sk) : 0;
+    S(q(r, "spark"), { op: spark * (1 - ko), s: lerp(.6, 1.25, E.outCubic(sk)) });
+    q(r, "spark").style.transformOrigin = "250px 580px";
+    q(r, "spark-glow").style.opacity = (spark * .9).toFixed(3);
+    // Arduino LED flashes when signal sent
+    const led = Math.sin(Math.PI * clamp((t - 2.85) / .5));
+    q(r, "led").setAttribute("fill", led > .05 ? "#F6D48C" : "#C38F3A");
+    q(r, "led").setAttribute("r", (8 + 5 * Math.max(0, led)).toFixed(2));
+
+    // STEP 2: USB cable drawn in, pulse travels
+    const usb = q(r, "usb");
+    draw(usb, p(t, 1.3, 1.1, E.inOutCubic));
+    usb.style.opacity = (1 - ko).toFixed(3);
+    q(r, "usb-plug").style.opacity = (p(t, 2.2, .3) * (1 - ko)).toFixed(3);
+    const kp = clamp((t - 3.75) / 1.05);
+    const pt = usb.getPointAtLength(E.inOutCubic(kp) * usb.getTotalLength());
+    const pv = kp > 0 && kp < 1 ? Math.sin(Math.PI * kp) ** .4 : 0;
+    ["pulse", "pulse-glow"].forEach(k => { const el = q(r, k); el.setAttribute("cx", pt.x.toFixed(2)); el.setAttribute("cy", pt.y.toFixed(2)); el.style.opacity = pv.toFixed(3); });
+
+    // question bubble (spoken by the user)
+    const kb = p(t, 4.95, .7, E.outBack);
+    const kbo = p(t, 6.6, .5, E.inCubic);
+    S(q(r, "bubble"), { op: p(t, 4.95, .35) * (1 - kbo) * (1 - ko), s: lerp(.85, 1, kb), y: 14 * (1 - kb) - 10 * kbo });
+    q(r, "bubble").style.transformOrigin = "860px 350px";
+    pulseArcs(qa(r, "q-arc"), t, 5.15, .7, (1 - kbo) * (1 - ko));
+
+    // screen stages: 0 listen, 1 transcribe, 2 answer, 3 speak
+    const stageT = [4.8, 6.2, 7.55, 9.6, 99];
+    qa(r, "stg").forEach((el, i) => {
+      const on = p(t, stageT[i], .35) * (1 - p(t, stageT[i + 1], .35));
+      el.querySelector(".hl").style.opacity = on.toFixed(3);
+      S(el.querySelector(".acc"), { op: on, sy: lerp(.3, 1, on), sx: 1 });
+      const done = t > stageT[i + 1] + .1;
+      const ic = el.querySelector(".ic");
+      ic.classList.toggle("done", done);
+      ic.textContent = done ? "✓" : String(i + 1);
+      el.style.opacity = (t < stageT[i] ? .55 : 1).toFixed(2);
+    });
+
+    // panel views (crossfade)
+    const view = (k, a, b) => {
+      const v = p(t, a, .4) * (b == null ? 1 : 1 - p(t, b, .35));
+      S(q(r, k), { op: v, y: 14 * (1 - p(t, a, .4)) });
+    };
+    view("pv-wait", 0, 4.8);
+    view("pv-rec", 4.85, 6.2);
+    view("pv-txt", 6.25, 7.55);
+    view("pv-ans", 7.6, null);
+    // recording waveform (deterministic pseudo-voice)
+    const voice = t > 5.05 && t < 6.15 ? 1 : 0.06;
+    qa(r, "wv").forEach((el, i) => {
+      const a = Math.abs(Math.sin(t * 7.3 + i * .9) * Math.sin(t * 3.1 + i * .37)) * voice;
+      const h = 6 + 150 * a * (0.5 + 0.5 * Math.sin(i * .5 + 1.2) ** 2);
+      el.setAttribute("y", (100 - h / 2).toFixed(2)); el.setAttribute("height", h.toFixed(2));
+    });
+    q(r, "recdot").style.opacity = (0.55 + 0.45 * Math.cos(t * 6)).toFixed(3);
+    // typed transcript
+    const qs = `“${C.sampleQuestion}”`;
+    const nType = Math.round(qs.length * clamp((t - 6.4) / .75));
+    q(r, "typed").textContent = qs.slice(0, nType) + (t < 7.3 && Math.floor(t * 3) % 2 ? "|" : "");
+    enter(q(r, "send"), t, 7.05, { d: .45, dist: 14, blur: 0 });
+    const press = Math.sin(Math.PI * clamp((t - 7.3) / .2));
+    q(r, "send").style.transform += ` scale(${1 - .08 * press})`;
+    // thinking dots, then answer words
+    const thinkOn = p(t, 7.7, .2) * (1 - p(t, 8.35, .2));
+    q(r, "think").style.opacity = thinkOn.toFixed(3);
+    qa(r, "td").forEach((el, i) => S(el, { y: -10 * Math.max(0, Math.sin(t * 9 - i * .8)) }));
+    const words = q(r, "ans").children;
+    [...words].forEach((w, i) => {
+      const k = p(t, 8.45 + i * .07, .35);
+      w.style.opacity = k.toFixed(3);
+    });
+    enter(q(r, "speaking"), t, 9.65, { d: .45, dist: 14, blur: 0 });
+    qa(r, "sb").forEach((el, i) => {
+      const h = t > 9.7 ? 4 + 14 * Math.abs(Math.sin(t * 8 + i * 1.3)) : 4;
+      el.setAttribute("y", (11 - h / 2).toFixed(2)); el.setAttribute("height", h.toFixed(2));
+    });
+    // speaker arcs outside the laptop
+    pulseArcs(qa(r, "spk-arc"), t, 9.7, .8, 1 - ko);
+
+    // caption bar: crossfade between step captions, pill width follows text
+    let idx = -1;
+    STEPS.forEach((s, i) => { if (t >= s.a - .02) idx = i; });
+    const cap = q(r, "cap");
+    const kc = p(t, 1.9, .6, E.outQuart);
+    cap.style.opacity = (kc * (1 - ko)).toFixed(3);
+    cap.style.transform = `translateX(-50%) translateY(${(30 * (1 - kc) + 10 * ko).toFixed(2)}px)`;
+    const items = qa(r, "capi");
+    items.forEach((el, i) => {
+      const a = STEPS[i].a;
+      // outgoing caption clears before the next arrives, so lines never overlap
+      const kin = p(t, a, .5, E.outQuart);
+      const kout = i < STEPS.length - 1 ? p(t, STEPS[i + 1].a - .24, .22, E.inCubic) : 0;
+      S(el, { op: kin * (1 - kout), y: 22 * (1 - kin) - 18 * kout, b: 4 * (1 - kin) });
+    });
+    // width interpolation between consecutive captions
+    if (r._capW) {
+      const i0 = Math.max(0, idx);
+      const prevW = r._capW[Math.max(0, i0 - 1)], curW = r._capW[i0];
+      const kw2 = i0 === 0 ? 1 : p(t, STEPS[i0].a - .1, .45, E.inOutCubic);
+      q(r, "capt").style.width = lerp(prevW, curW, kw2).toFixed(1) + "px";
+    }
+    const n = q(r, "capn");
+    n.textContent = String(Math.max(1, idx + 1));
+    const kn = idx >= 0 ? p(t, STEPS[idx].a, .45, E.outBack) : 0;
+    S(n, { s: lerp(.6, 1, kn) });
+  }
+};
+
+/* 4 ─ FUTURE DESIGN (wristband concept) */
+scenes.future = {
+  dur: 6, bg: "bg-cream",
+  html: () => `
+    <div class="abs" data-k="badge" style="left:120px;top:96px;display:flex;align-items:center;gap:14px;padding:14px 26px;border:3px dashed var(--brass);border-radius:40px;background:rgba(195,143,58,.08)">
+      <span style="width:14px;height:14px;border-radius:50%;background:var(--brass)"></span>
+      <span style="font:700 26px/1 var(--text);letter-spacing:.2em;color:#9C6E22">FUTURE DESIGN</span>
+      <span style="font:500 24px/1 var(--text);color:var(--muted)">· concept, not built yet</span>
+    </div>
+    <svg class="abs" style="left:0;top:0" width="${W}" height="${H}">
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#2C5E45" stroke-opacity=".08" stroke-width="1.5"/></pattern>
+        <linearGradient id="strap" x1="0" x2="1"><stop offset="0" stop-color="#1F4735"/><stop offset=".5" stop-color="#2C5E45"/><stop offset="1" stop-color="#1F4735"/></linearGradient>
+        <filter id="sh2" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#183A2B" flood-opacity=".22"/></filter>
+      </defs>
+      <rect data-k="grid" x="200" y="230" width="640" height="720" rx="40" fill="url(#grid)"/>
+      <g data-k="band" filter="url(#sh2)">
+        <path d="M 440 250 L 600 250 Q 612 250 612 262 L 618 470 L 422 470 L 428 262 Q 428 250 440 250 Z" fill="url(#strap)"/>
+        <path d="M 422 690 L 618 690 L 612 898 Q 612 910 600 910 L 440 910 Q 428 910 428 898 Z" fill="url(#strap)"/>
+        ${[0,1,2,3].map(i => `<rect x="506" y="${758 + i * 34}" width="28" height="12" rx="6" fill="#102A1F" opacity=".6"/>`).join("")}
+        <rect x="390" y="450" width="260" height="260" rx="72" fill="#183A2B"/>
+        <rect x="402" y="462" width="236" height="236" rx="62" fill="none" stroke="#8FAE93" stroke-opacity=".35" stroke-width="2"/>
+      </g>
+      <circle data-k="wring" cx="520" cy="580" r="70" fill="none" stroke="#C38F3A" stroke-width="5"/>
+      <circle data-k="wring" cx="520" cy="580" r="70" fill="none" stroke="#C38F3A" stroke-width="5"/>
+      <g data-k="wbtn"><circle cx="520" cy="580" r="64" fill="#F4EEE1"/><circle cx="520" cy="580" r="22" fill="#C38F3A"/></g>
+      <g data-k="warcs">${arcs(660, 580, 3, 36, 30, "#2C5E45", 7, "w-arc", 1, 44)}</g>
+      <!-- blueprint outline drawn first -->
+      <path data-k="outline" pathLength="1" stroke-dasharray="1" fill="none" stroke="#C38F3A" stroke-width="3" stroke-linejoin="round"
+        d="M 440 250 L 600 250 Q 612 250 612 262 L 618 450 Q 650 450 650 522 L 650 638 Q 650 710 618 710 L 612 898 Q 612 910 600 910 L 440 910 Q 428 910 428 898 L 422 710 Q 390 710 390 638 L 390 522 Q 390 450 422 450 L 428 262 Q 428 250 440 250 Z"/>
+    </svg>
+    <div class="abs h1" data-k="h" style="left:960px;top:300px;width:820px;font-size:70px">Next: Pocket Task<br>on your wrist.</div>
+    <div class="abs body" data-k="b1" style="left:960px;top:480px;width:780px;font-size:36px;color:var(--green)">A smaller wristband with one button: press, ask, hear the answer.</div>
+    <div class="abs" data-k="b2" style="left:960px;top:650px;width:780px">
+      <div class="eyebrow" style="color:var(--brass)">Still to develop</div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:22px">
+        ${["Enclosure", "Switch assembly", "Power system", "Smaller hardware"].map(s => `<span data-k="pill" style="padding:14px 24px;border-radius:30px;border:2px solid var(--cream-3);background:#FBF7EE;font:500 28px/1 var(--text)">${s}</span>`).join("")}
+      </div>
+    </div>
+  `,
+  update(r, t) {
+    const out = 5.45, ko = p(t, out, .5, E.inCubic);
+    enter(q(r, "badge"), t, .05, { out, dist: 20 });
+    S(q(r, "grid"), { op: p(t, .1, .8) * (1 - ko) });
+    // blueprint outline draws, then solid band fades in under it
+    const ol = q(r, "outline");
+    draw(ol, p(t, .2, 1.3, E.inOutCubic));
+    ol.style.opacity = ((1 - p(t, 1.6, .6)) * (1 - ko)).toFixed(3);
+    const kb = p(t, 1.15, .8, E.outCubic);
+    S(q(r, "band"), { op: kb * (1 - ko), y: -10 * ko });
+    // button press + rings + sound
+    const press = Math.sin(Math.PI * clamp((t - 2.35) / .3));
+    const kbt = p(t, 1.35, .7, E.outBack);
+    const btn = q(r, "wbtn");
+    btn.style.transformOrigin = "520px 580px";
+    S(btn, { op: p(t, 1.35, .3) * (1 - ko), s: lerp(.6, 1, kbt) * (1 - .08 * press) });
+    qa(r, "wring").forEach((el, i) => {
+      const k = clamp((t - 2.5 - i * .25) / 1.3), e = E.outCubic(k);
+      el.setAttribute("r", (64 + 120 * e).toFixed(2));
+      el.style.opacity = (k <= 0 || k >= 1 ? 0 : (1 - e) * .7 * (1 - ko)).toFixed(3);
+    });
+    pulseArcs(qa(r, "w-arc"), t, 2.9, .85, 1 - ko);
+    enter(q(r, "h"), t, .45, { out, dist: 44 });
+    enter(q(r, "b1"), t, .75, { out });
+    enter(q(r, "b2"), t, 1.15, { out });
+    qa(r, "pill").forEach((el, i) => enter(el, t, 1.35 + i * .12, { d: .6, dist: 18, blur: 3 }));
+  }
+};
+
+/* 5 ─ COST / PRICE / MARKETING (editable fields) */
+scenes.cost = {
+  dur: 7, bg: "bg-cream",
+  html: () => `
+    <div class="abs eyebrow" data-k="eb" style="left:120px;top:110px">The business</div>
+    <div class="abs h1" data-k="h" style="left:120px;top:150px">Cost, price &amp; marketing</div>
+    <div class="abs card" data-k="c1" style="left:120px;top:300px;width:960px;height:500px;background:#FBF7EE;border:2px solid var(--cream-2);box-shadow:0 18px 50px rgba(24,58,43,.08);padding:36px 50px">
+      ${C.cost.map(f => `<div class="field-row" data-k="row"><div class="l">${esc(f.label)}</div>
+        <div class="v ${f.value ? "filled" : "empty"}">${f.value ? esc(f.value) : "TO CONFIRM"}</div></div>`).join("")}
+    </div>
+    <div class="abs card" data-k="c2" style="left:1120px;top:300px;width:680px;height:500px;background:var(--green);box-shadow:0 18px 50px rgba(24,58,43,.22);padding:50px 54px">
+      <div class="eyebrow" style="color:var(--brass-soft)">How we'll reach people</div>
+      <div style="margin-top:40px">
+        ${C.marketing.map(m => `<div class="mk" data-k="mk"><div class="dot"></div><div class="tx">${esc(m.text)}${m.confirmed ? "" : `<span class="draft">DRAFT</span>`}</div></div>`).join("")}
+      </div>
+    </div>
+  `,
+  update(r, t) {
+    const out = 6.45, ko = p(t, out, .5, E.inCubic);
+    enter(q(r, "eb"), t, .05, { out });
+    enter(q(r, "h"), t, .15, { out, dist: 44 });
+    ["c1", "c2"].forEach((k, i) => {
+      const kk = p(t, .45 + i * .2, .95, E.outQuint);
+      S(q(r, k), { op: kk * (1 - ko), y: 80 * (1 - kk) - 18 * ko, s: lerp(.97, 1, kk), b: 5 * (1 - kk) });
+    });
+    qa(r, "row").forEach((el, i) => {
+      enter(el, t, .95 + i * .16, { d: .7, dist: 0, blur: 3 });
+      const v = el.querySelector(".v");
+      const kv = p(t, 1.25 + i * .16, .6, E.outBack);
+      S(v, { op: kv, s: lerp(.8, 1, kv) });
+    });
+    qa(r, "mk").forEach((el, i) => enter(el, t, 1.35 + i * .18, { d: .7, dist: 24, blur: 4 }));
+  }
+};
+
+/* 6 ─ CLOSING */
+scenes.closing = {
+  dur: 5, bg: "bg-green",
+  html: () => `
+    <svg class="abs" style="left:0;top:0" width="${W}" height="${H}">
+      ${[0,1,2].map(() => `<circle data-k="ring" cx="960" cy="330" r="90" fill="none" stroke="#C38F3A" stroke-width="3"/>`).join("")}
+    </svg>
+    <div class="abs" data-k="mark" style="left:880px;top:250px;width:160px;height:160px">${markSVG(160, "#F4EEE1", "#183A2B", "#C38F3A")}</div>
+    <div class="abs center-x wordmark" data-k="word" style="top:470px;font-size:132px;color:var(--cream)">${esc(C.projectName)}</div>
+    <div class="abs center-x" data-k="tag" style="top:630px;font:500 42px/1 var(--text);color:var(--brass-soft)">${esc(C.tagline)}</div>
+    <div class="abs center-x" data-k="cred" style="top:770px;font:600 34px/1.3 var(--text);color:var(--cream)">${esc(C.student)}<span style="color:var(--brass)"> · </span><span style="font-weight:500;color:rgba(244,238,225,.7)">${esc(C.details)}</span></div>
+    <div class="abs center-x" data-k="ty" style="top:836px;font:500 28px/1.3 var(--text);color:rgba(244,238,225,.6);letter-spacing:.04em">${esc(C.event)}${C.team ? " · " + esc(C.team) : ""} · Thank you</div>
+  `,
+  update(r, t) {
+    const km = p(t, .1, .8, E.outBack);
+    S(q(r, "mark"), { op: p(t, .1, .35), s: lerp(.55, 1, km) * (1 - .07 * Math.sin(Math.PI * clamp((t - .95) / .26))) });
+    qa(r, "ring").forEach((el, i) => {
+      const k = clamp((t - 1.0 - i * .22) / 1.6), e = E.outCubic(k);
+      el.setAttribute("r", (80 + 200 * e).toFixed(2));
+      el.style.opacity = (k <= 0 || k >= 1 ? 0 : (1 - e) * .6).toFixed(3);
+    });
+    const kw = p(t, .45, 1.0, E.outQuart);
+    S(q(r, "word"), { op: kw, y: 50 * (1 - kw), b: 10 * (1 - kw), s: lerp(.97, 1, kw) });
+    enter(q(r, "tag"), t, .85);
+    enter(q(r, "cred"), t, 1.15);
+    enter(q(r, "ty"), t, 1.35);
+    // final half-second: slow settle (gentle zoom) for a calm ending
+    const kz = p(t, 1.8, 3.2, E.inOutSine);
+    r.style.transform = `scale(${lerp(1, 1.025, kz)})`;
+  }
+};
+
+/* ---------- OVERLAYS (render with transparent background) ---------- */
+scenes.lowerthird = {
+  dur: 5, transparent: true,
+  html: () => `
+    <div class="abs" data-k="blk" style="left:96px;top:820px;width:16px;height:150px;border-radius:8px;background:var(--brass)"></div>
+    <div class="abs" data-k="box" style="left:128px;top:820px;height:150px;border-radius:24px;background:rgba(24,58,43,.95);overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.25)">
+      <div data-k="inner" style="padding:28px 46px 0 40px;white-space:nowrap;color:var(--cream)">
+        <div data-k="nm" style="font:700 50px/1.05 var(--display);letter-spacing:-.01em">${esc(C.student)}</div>
+        <div data-k="sub" style="font:500 28px/1.2 var(--text);color:var(--brass-soft);margin-top:12px">${esc(C.details)} · ${esc(C.projectName)}</div>
+      </div>
+    </div>
+  `,
+  init(r) { r._w = q(r, "inner").getBoundingClientRect().width / (r._scale || 1); },
+  update(r, t) {
+    const out = 4.3;
+    const kb = p(t, .05, .5, E.outQuart), kbo = p(t, out + .25, .4, E.inCubic);
+    S(q(r, "blk"), { op: kb * (1 - kbo), sy: kb, sx: 1 });
+    q(r, "blk").style.transformOrigin = "50% 100%";
+    const kw = p(t, .25, .8, E.outQuint), kwo = p(t, out, .45, E.inCubic);
+    q(r, "box").style.width = ((r._w || 600) * kw * (1 - kwo)).toFixed(1) + "px";
+    q(r, "box").style.opacity = kw > 0.01 && kwo < .99 ? "1" : "0";
+    enter(q(r, "nm"), t, .45, { d: .6, dist: 24, blur: 4, out: out - .1, dOut: .3 });
+    enter(q(r, "sub"), t, .6, { d: .6, dist: 20, blur: 4, out: out - .15, dOut: .3 });
+  }
+};
+function badgeScene(title, sub, icon) {
+  return {
+    dur: 3, transparent: true,
+    html: () => `<div class="abs badge" data-k="b" style="left:72px;top:64px">
+      <div class="ico">${icon}</div><div><div class="a">${esc(title)}</div><div class="b">${esc(sub)}</div></div></div>`,
+    update(r, t) {
+      const k = p(t, .05, .6, E.outQuart), ko = p(t, 2.5, .45, E.inCubic);
+      S(q(r, "b"), { op: k * (1 - ko), x: -30 * (1 - k), b: 4 * (1 - k) });
+    }
+  };
+}
+scenes["badge-demo"] = badgeScene(C.demoBadge, C.demoBadgeSub,
+  `<svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="9" fill="#102A1F"/></svg>`);
+scenes["badge-shortened"] = badgeScene(C.shortenedBadge, C.shortenedBadgeSub,
+  `<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="#102A1F" stroke-width="3.5"/><path d="M15 8 V15 L20 18" fill="none" stroke="#102A1F" stroke-width="3.5" stroke-linecap="round"/></svg>`);
+
+/* ---------- SLOT placeholder for animatic ---------- */
+function slotScene(item) {
+  return {
+    dur: item.dur, cls: "slot",
+    html: () => `<div class="frame"></div>
+      <div class="abs eyebrow" style="left:140px;top:140px;color:var(--brass-soft)">Insert your footage here</div>
+      <div class="abs h1" style="left:140px;top:190px;width:1640px;color:var(--cream)">${esc(item.label)}</div>
+      <div class="abs" style="left:140px;top:360px;width:1500px;font:400 40px/1.4 var(--text);color:rgba(244,238,225,.8)"><span style="color:var(--brass-soft);font-weight:600">Say: </span>${esc(item.say)}</div>
+      <div class="abs" data-k="tc" style="left:140px;bottom:120px;font:700 64px/1 var(--display);color:var(--cream);font-variant-numeric:tabular-nums"></div>
+      <div class="abs" style="right:140px;bottom:126px;font:500 30px/1 var(--text);color:rgba(244,238,225,.55)">${item.dur} s slot · placeholder only</div>`,
+    update(r, t) { q(r, "tc").textContent = `${t.toFixed(1)} / ${item.dur}.0 s`; }
+  };
+}
+(window.PT_TIMELINE || []).forEach(it => { if (it.type === "slot") scenes[it.id] = slotScene(it); });
+
+/* ================= ENGINE ================= */
+const stage = document.getElementById("stage");
+const roots = {};
+let scale = 1;
+for (const [id, sc] of Object.entries(scenes)) {
+  const el = document.createElement("div");
+  el.className = `scene ${sc.bg || ""} ${sc.cls || ""}`;
+  el.innerHTML = sc.html();
+  el.dataset.scene = id;
+  stage.appendChild(el);
+  roots[id] = el;
+}
+function show(id) {
+  for (const [k, el] of Object.entries(roots)) el.classList.toggle("active", k === id);
+  const r = roots[id];
+  if (!r._inited) { r._inited = true; r._scale = scale; scenes[id].init?.(r); }
+}
+function render(id, t) {
+  show(id);
+  document.documentElement.classList.toggle("transparent", !!scenes[id].transparent);
+  scenes[id].update(roots[id], clamp(t, 0, scenes[id].dur));
+}
+const timeline = (window.PT_TIMELINE || []).filter(it => scenes[it.id]);
+const totalDur = timeline.reduce((s, it) => s + it.dur, 0);
+function renderTimeline(T) {
+  let acc = 0;
+  for (const it of timeline) {
+    if (T < acc + it.dur || it === timeline[timeline.length - 1]) { render(it.id, T - acc); return it.id; }
+    acc += it.dur;
+  }
+}
+window.PT = {
+  scenes: Object.fromEntries(Object.entries(scenes).map(([k, s]) => [k, { dur: s.dur, transparent: !!s.transparent }])),
+  timeline: timeline.map(it => ({ id: it.id, dur: it.dur, type: it.type })),
+  totalDur, render, renderTimeline,
+  ready: document.fonts.ready.then(() => true),
+};
+
+/* ---------- preview player (ignored when rendering) ---------- */
+const params = new URLSearchParams(location.search);
+if (params.has("render")) { document.body.classList.add("render"); return; }
+
+const vp = document.getElementById("viewport");
+function fit() {
+  const r = vp.getBoundingClientRect();
+  scale = Math.min(r.width / W, r.height / H);
+  stage.style.transform = `translate(${(r.width - W * scale) / 2}px,${(r.height - H * scale) / 2}px) scale(${scale})`;
+}
+addEventListener("resize", fit); fit();
+
+const sel = document.getElementById("sceneSel");
+sel.innerHTML = `<option value="__all">Full video (animatic, ${totalDur}s)</option>` +
+  Object.keys(scenes).map(k => `<option value="${k}">${k} (${scenes[k].dur}s)</option>`).join("");
+let cur = params.get("scene") || "__all", T = 0, playing = true, last = performance.now();
+sel.value = cur;
+const durOf = () => cur === "__all" ? totalDur : scenes[cur].dur;
+const scrub = document.getElementById("scrub"), lbl = document.getElementById("timeLbl"), btn = document.getElementById("playBtn");
+sel.onchange = () => { cur = sel.value; T = 0; };
+btn.onclick = () => { playing = !playing; btn.textContent = playing ? "Pause" : "Play"; };
+scrub.oninput = () => { T = scrub.value / 1000 * durOf(); playing = false; btn.textContent = "Play"; };
+addEventListener("keydown", e => { if (e.code === "Space") { e.preventDefault(); btn.click(); } });
+function loop(now) {
+  const dt = Math.min(.1, (now - last) / 1000); last = now;
+  if (playing) { T += dt; if (T > durOf()) T = 0; }
+  if (cur === "__all") renderTimeline(T); else render(cur, T);
+  scrub.value = Math.round(T / durOf() * 1000);
+  lbl.textContent = `${T.toFixed(2)} / ${durOf().toFixed(0)} s`;
+  requestAnimationFrame(loop);
+}
+document.fonts.ready.then(() => requestAnimationFrame(loop));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "pocket-task-animation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pocket Task competition video animation package",
+  "scripts": {
+    "render": "node render.mjs",
+    "render:scenes": "node render.mjs scenes",
+    "render:overlays": "node render.mjs overlays",
+    "render:animatic": "node render.mjs animatic"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "playwright": "^1.56.1"
+  }
+}
