@@ -6,7 +6,7 @@
 
   Any cost/price value left as "" shows on screen as a dashed
   "TO CONFIRM" box, so unfinished numbers can never look final.
-  Marketing lines with confirmed: true show a small "DRAFT" tag.
+  Marketing lines with confirmed: false show a small "DRAFT" tag.
   Set confirmed: true only once you have checked the line.
 */
 window.PT_CONTENT = {

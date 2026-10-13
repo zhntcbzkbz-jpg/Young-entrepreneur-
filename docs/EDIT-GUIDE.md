@@ -127,6 +127,12 @@ Resolve: Deliver → MP4 → H.264 → Quality: restrict to **2500 Kb/s**.
 ffmpeg -i my-edit.mp4 -c:v libx264 -b:v 2500k -maxrate 3000k -bufsize 5000k -preset slow -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart pocket-task-final.mp4
 ```
 
+**720p version (smaller, ≈ 10–22 MB for 80 s).** Keeps every scene and the full audio track:
+```
+ffmpeg -i my-edit.mp4 -vf scale=1280:720:flags=lanczos -r 30 -c:v libx264 -preset slow -b:v 2000k -maxrate 2500k -bufsize 4000k -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart pocket-task-final-720p.mp4
+```
+Check it with `ffprobe -v error -show_entries format=duration,size -of default=nw=1 pocket-task-final-720p.mp4`. Size is in bytes and must be below 31,457,280 (30 MB).
+
 ---
 
 ## 5. Final checklist before submitting
