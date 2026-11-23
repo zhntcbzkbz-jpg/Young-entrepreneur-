@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Deep Cut</title>
+  <meta name="description" content="A daily trivia game where the rarest correct answer wins.">
+  <meta name="theme-color" content="#f3f0e8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141311" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <a class="wordmark" href="#" data-action="home" aria-label="Deep Cut, home">Deep Cut</a>
+      <p class="dateline" id="dateline"></p>
+    </header>
+    <main id="app" aria-live="polite"></main>
+    <footer class="colophon">
+      <p>Popularity figures are editorial estimates of how 100 people would answer, not survey data.
+        <span id="judge-note"></span></p>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
