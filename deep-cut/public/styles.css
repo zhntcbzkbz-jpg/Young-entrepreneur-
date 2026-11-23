@@ -329,7 +329,7 @@ button { font: inherit; color: inherit; }
   padding: 5px 0;
   font-size: 15px;
 }
-.dist .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dist .name { line-height: 1.25; overflow-wrap: anywhere; }
 .dist .bar { height: 8px; background: var(--track); border-radius: 2px; overflow: hidden; }
 .dist .bar i { display: block; height: 100%; background: var(--ink); border-radius: 2px; min-width: 2px; }
 .dist .pct { font: 13px/1 var(--mono); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
