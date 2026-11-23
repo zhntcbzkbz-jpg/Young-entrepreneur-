@@ -1,9 +1,10 @@
 import { PROMPTS, THEMES } from "./prompts.js";
 import {
   ROUND_SECONDS, DAILY_ROUNDS, ENDLESS_LIVES,
-  preparePrompt, matchAnswer, pointsFor, tierFor, oneIn,
+  preparePrompt, matchAnswer, pointsFor, oneIn,
   dailyPrompts, dailyNumber, localDateKey, shuffle, rng, hashString, sparkline, normalize, displayName,
 } from "./engine.js";
+import { rocketSVG, shipSVG, planetImg, startStarfield, sfx, isMuted, setMuted } from "./pixel.js";
 
 const POOL = PROMPTS.map(preparePrompt);
 const BY_ID = new Map(POOL.map((p) => [p.id, p]));
@@ -109,8 +110,36 @@ const total = (rounds) => rounds.reduce((s, r) => s + r.points, 0);
 /** Small bar chart of round scores. The share text uses a Unicode sparkline instead. */
 function bars(scores) {
   return `<div class="bars" role="img" aria-label="Round scores: ${scores.join(", ")}">${scores
-    .map((s) => `<i class="${s >= 80 ? "hot" : s === 0 ? "zero" : ""}" style="height:${Math.max(6, s)}%"></i>`)
+    .map((s) => `<i class="${s >= 80 ? "hot" : s === 0 ? "zero" : ""}" style="height:${Math.max(8, s)}%"></i>`)
     .join("")}</div>`;
+}
+
+// How far an answer flies. The track gives each zone a quarter of its length,
+// so the rare end isn't squashed into the last few pixels.
+const ZONES = [
+  { key: "orbit", label: "Low orbit", from: 5, to: 40 },
+  { key: "moon", label: "Moon range", from: 40, to: 75 },
+  { key: "outer", label: "Outer planets", from: 75, to: 95 },
+  { key: "deep", label: "Deep space", from: 95, to: 100 },
+];
+
+function zoneFor(points) {
+  if (points <= 0) return { key: "pad", label: "Still on the pad" };
+  return ZONES.find((z) => points < z.to) || ZONES[ZONES.length - 1];
+}
+
+function trackPercent(points) {
+  if (points <= 0) return 0;
+  const i = ZONES.findIndex((z) => points < z.to);
+  const z = ZONES[i === -1 ? ZONES.length - 1 : i];
+  const idx = i === -1 ? ZONES.length - 1 : i;
+  const within = (Math.min(points, z.to) - z.from) / (z.to - z.from);
+  return Math.max(2, (idx + within) * 25);
+}
+
+function ships(lives) {
+  return `<span class="ships" aria-label="${lives} ships left">${Array.from({ length: ENDLESS_LIVES }, (_, i) =>
+    shipSVG(i < lives ? "" : "lost")).join("")}</span>`;
 }
 
 let toastTimer;
@@ -181,52 +210,60 @@ function renderHome() {
   if (saved?.done) {
     const scores = saved.rounds.map((r) => r.points);
     daily = `
-      <div class="done-card">
-        <p class="kicker">Today's seven, done</p>
+      <div class="frame done-card">
+        <p class="kicker">Daily No. ${no} · mission complete</p>
         <p class="total"><b>${total(saved.rounds)}</b><span>/ ${DAILY_ROUNDS * 100}</span></p>
         ${bars(scores)}
-        <p class="sub" style="margin:0 0 16px">The next seven unlock in ${untilMidnight()}.</p>
+        <p class="sub">Next launch window opens in ${untilMidnight()}.</p>
         <div class="actions">
-          <button class="btn" data-action="daily">See results</button>
-          <button class="btn secondary" data-action="endless">Play endless</button>
+          <button class="btn" data-action="daily">Flight log</button>
+          <button class="btn secondary" data-action="endless">Endless</button>
         </div>
       </div>`;
   } else {
     const resume = saved?.rounds?.length;
     daily = `
       <div class="actions">
-        <button class="btn" data-action="daily">${resume ? `Resume today's seven (round ${resume + 1})` : "Play today's seven"}</button>
+        <button class="btn" data-action="daily"><span class="arrow">▶</span>${resume ? `Resume daily (${resume + 1}/${DAILY_ROUNDS})` : `Launch daily No. ${no}`}</button>
         <button class="btn secondary" data-action="endless">Endless</button>
       </div>`;
   }
 
   show(`
-    <p class="kicker">Daily No. ${no}</p>
-    <h1 class="lede">Name the thing nobody else would.</h1>
-    <p class="sub">Seven prompts, ${ROUND_SECONDS} seconds each. Common answers score a few points. Rare answers that are still correct score up to 100.</p>
+    <div class="hero">
+      <div>
+        <p class="kicker">Daily No. ${no} · ${DAILY_ROUNDS} prompts · ${ROUND_SECONDS}s each</p>
+        <h1 class="lede">How far out can you <em>get?</em></h1>
+        <p class="sub">Common answers barely leave orbit. Rare answers that are still right fly into deep space, for up to 100 points.</p>
+      </div>
+      <div class="hero-art">${rocketSVG("rocket")}${planetImg("Earth", 24, 3, "planet")}</div>
+    </div>
     ${daily}
 
     <div class="stats">
-      <div class="stat"><b>${streak()}</b><span>Day streak</span></div>
-      <div class="stat"><b>${bestDaily() || "–"}</b><span>Best daily</span></div>
-      <div class="stat"><b>${store.endlessBest || "–"}</b><span>Best endless</span></div>
+      <div class="frame stat"><b>${streak()}</b><span>Day streak</span></div>
+      <div class="frame stat"><b>${bestDaily() || "--"}</b><span>Best daily</span></div>
+      <div class="frame stat"><b>${store.endlessBest || "--"}</b><span>Best endless</span></div>
     </div>
 
-    <div class="section-head"><h2>Theme packs</h2><p>Five prompts each</p></div>
+    <div class="section-head"><h2>Theme planets</h2><p>Five prompts each</p></div>
     <div class="packs">
       ${THEMES.map((t) => `
-        <button class="pack" data-action="pack" data-theme="${esc(t)}">
-          <strong>${esc(t)}</strong>
-          <span>${store.packBest[t] ? `Best ${store.packBest[t]}` : "Not played"}</span>
+        <button class="frame pack" data-action="pack" data-theme="${esc(t)}">
+          ${planetImg(t, 16, 3)}
+          <span><strong>${esc(t)}</strong><span>${store.packBest[t] ? `Best ${store.packBest[t]}` : "Unexplored"}</span></span>
         </button>`).join("")}
     </div>
 
     <div class="section-head"><h2>How it works</h2></div>
     <ol class="rules">
       <li><span><b>Answer the prompt.</b> Any correct answer counts, and small spelling slips are fine.</span></li>
-      <li><span><b>Rarer scores higher.</b> The most common answer gets 5 points. One almost nobody gives gets close to 100.</span></li>
-      <li><span><b>Wrong, blank or out of time scores 0.</b> In Endless, three of those end the run.</span></li>
+      <li><span><b>Rarer flies further.</b> The most common answer scores 5. One almost nobody gives scores close to 100.</span></li>
+      <li><span><b>Wrong, blank or out of fuel scores 0.</b> In Endless you have three ships, and each zero costs one.</span></li>
     </ol>
+    <div class="zones">
+      ${ZONES.map((z) => `<div class="frame z-${z.key}"><b>${z.label}</b>${z.from}${z.to === 100 ? "+" : `–${z.to - 1}`}</div>`).join("")}
+    </div>
   `);
 }
 
@@ -234,23 +271,29 @@ function renderHome() {
 
 function renderRound() {
   const prompt = game.prompts[game.index];
-  const meta = game.mode === "endless"
-    ? `<span>Round ${game.index + 1}</span><span class="lives" aria-label="${game.lives} lives left">${"●".repeat(game.lives)}<span class="lost">${"○".repeat(ENDLESS_LIVES - game.lives)}</span></span><span>${total(game.rounds)} pts</span>`
-    : `<span>${game.index + 1} / ${game.prompts.length} · ${esc(prompt.theme)}</span><span>${total(game.rounds)} pts</span>`;
+  const left = game.mode === "endless"
+    ? `<span>Round ${game.index + 1}</span>${ships(game.lives)}`
+    : `<span>${game.index + 1}/${game.prompts.length} · ${esc(prompt.theme)}</span>`;
 
   show(`
-    <div class="round-meta">${meta}</div>
-    <div class="timer" id="timer" role="progressbar" aria-label="Time left" aria-valuemin="0" aria-valuemax="${ROUND_SECONDS}"><i></i></div>
+    <div class="round-meta">${left}<span class="score">${total(game.rounds)} pts</span></div>
+    <div class="fuel" id="fuel" role="timer" aria-label="Seconds left">
+      <label>FUEL</label>
+      <div class="frame cells">${"<i></i>".repeat(ROUND_SECONDS)}</div>
+      <span class="secs" id="secs">${ROUND_SECONDS}</span>
+    </div>
     <h1 class="prompt">${esc(prompt.text)}</h1>
     <form class="answer-form" id="answer-form" autocomplete="off">
-      <input class="answer-input" id="answer" name="answer" maxlength="60" placeholder="Your answer"
-        autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Your answer">
+      <div class="frame answer-box">
+        <input class="answer-input" id="answer" name="answer" maxlength="60" placeholder="your answer"
+          autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="Your answer">
+      </div>
       <div class="form-foot">
         <div class="actions">
-          <button class="btn" type="submit">Answer</button>
-          <button class="btn link" type="button" data-action="pass">Pass</button>
+          <button class="btn" type="submit"><span class="arrow">▶</span>Launch</button>
+          <button class="btn ghost" type="button" data-action="pass">Pass</button>
         </div>
-        <span class="hint" id="hint">Press Enter to answer</span>
+        <span class="hint" id="hint">Enter to launch · Esc to pass</span>
       </div>
     </form>
   `);
@@ -265,19 +308,21 @@ function renderRound() {
 }
 
 function startTimer(onExpire) {
-  const bar = document.querySelector("#timer i");
-  const wrap = document.getElementById("timer");
+  const cells = [...document.querySelectorAll("#fuel .cells i")];
+  const fuel = document.getElementById("fuel");
+  const secsEl = document.getElementById("secs");
   const start = performance.now();
   const totalMs = ROUND_SECONDS * 1000;
   let lastSecond = ROUND_SECONDS;
   const tick = (now) => {
     const left = Math.max(0, totalMs - (now - start));
-    bar.style.transform = `scaleX(${left / totalMs})`;
     const secs = Math.ceil(left / 1000);
     if (secs !== lastSecond) {
       lastSecond = secs;
-      wrap.setAttribute("aria-valuenow", String(secs));
-      wrap.classList.toggle("low", secs <= 5);
+      secsEl.textContent = String(secs);
+      cells.forEach((c, i) => c.classList.toggle("out", i >= secs));
+      fuel.classList.toggle("low", secs <= 5);
+      if (secs <= 5 && secs > 0) sfx.tick();
     }
     if (left <= 0) {
       timer = null;
@@ -346,7 +391,7 @@ function setChecking() {
   const hint = document.getElementById("hint");
   if (hint) {
     hint.className = "checking";
-    hint.textContent = "Not on our list. Checking with Claude";
+    hint.textContent = "Not on our list. Asking Claude to check it";
   }
 }
 
@@ -368,11 +413,11 @@ function describe(round) {
   }
 }
 
-function distribution(prompt, round) {
+function distribution(prompt, round, zoneClass) {
   const top = prompt.answers.slice(0, 5);
   const youIndex = round.name ? prompt.answers.findIndex((a) => a.name === round.name) : -1;
   const row = (name, share, you) => `
-    <li class="${you ? "you" : ""}">
+    <li class="${you ? `you ${zoneClass}` : ""}">
       <span class="name">${esc(name)}</span>
       <span class="bar"><i style="width:${Math.max(1, (share / prompt.top) * 100).toFixed(1)}%"></i></span>
       <span class="pct">${share >= 1 ? Math.round(share) : share.toFixed(1)}%</span>
@@ -380,10 +425,25 @@ function distribution(prompt, round) {
   let html = top.map((a, i) => row(displayName(prompt, a.name), a.share, i === youIndex)).join("");
   const outsideTop = round.share != null && (youIndex === -1 || youIndex >= 5);
   if (outsideTop) {
-    html += `<li class="gap" aria-hidden="true">⋮</li>`;
+    html += `<li class="gap" aria-hidden="true">· · ·</li>`;
     html += row(round.display, round.share, true);
   }
   return `<ul class="dist" aria-label="Most common answers">${html}</ul>`;
+}
+
+function flightPath(points, zone) {
+  return `
+    <div class="frame flight z-${zone.key}">
+      <div class="track" id="track" style="--to:0%" role="img" aria-label="Flew to ${zone.label}">
+        ${planetImg("Earth", 16, 2.5, "earth")}
+        <span class="line"></span>
+        <span class="tick" style="left:25%"></span><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span>
+        <span class="deep"></span>
+        <span class="trail"></span>
+        ${rocketSVG("ship")}
+      </div>
+      <div class="legend">${ZONES.map((z) => `<span class="${z.key === zone.key ? `on z-${z.key}` : ""}">${z.label}</span>`).join("")}</div>
+    </div>`;
 }
 
 function deepCuts(prompt, round) {
@@ -394,36 +454,58 @@ function deepCuts(prompt, round) {
 
 function renderReveal(prompt, round) {
   const last = game.mode === "endless" ? game.lives <= 0 : game.index + 1 >= game.prompts.length;
-  const tier = round.share != null ? tierFor(round.share) : null;
-  const tierClass = tier === "Deep cut" ? "deep" : tier === "Uncommon" ? "uncommon" : "";
+  const zone = zoneFor(round.points);
   const said = round.input ? round.display : "No answer";
   const cuts = deepCuts(prompt, round);
 
   let judged = "";
-  if (round.status === "judged") judged = `<p class="judged">Not on our list, so Claude checked it and accepted it. ${esc(round.note)}</p>`;
-  if (round.status === "invalid" && round.note) judged = `<p class="judged">Not on our list, so Claude checked it. ${esc(round.note)}</p>`;
+  if (round.status === "judged") judged = `<p class="judged"><b>Checked by Claude.</b> Not on our list, but accepted. ${esc(round.note)}</p>`;
+  if (round.status === "invalid" && round.note) judged = `<p class="judged"><b>Checked by Claude.</b> ${esc(round.note)}</p>`;
 
   show(`
-    <div class="round-meta"><span>${esc(prompt.text)}</span><span>${total(game.rounds)} pts</span></div>
+    <div class="round-meta"><span>${esc(prompt.text)}</span><span class="score">${total(game.rounds)} pts</span></div>
     <div class="verdict">
       <div>
-        ${tier ? `<span class="tier ${tierClass}">${tier}</span>` : ""}
+        <span class="zone z-${zone.key}">${zone.label}</span>
         <p class="said ${round.points ? "" : "miss"}">${esc(said)}</p>
         <p class="detail">${describe(round)}</p>
       </div>
-      <div class="points"><b>${round.points}</b><span>points</span></div>
+      <div class="points"><b id="pts">0</b><span>points</span></div>
     </div>
+    ${flightPath(round.points, zone)}
     ${judged}
     <p class="kicker">What most people say</p>
-    ${distribution(prompt, round)}
-    ${cuts.length ? `<p class="cuts">Deep cuts on our list: <b>${cuts.map(esc).join("</b>, <b>")}</b>.</p>` : ""}
+    ${distribution(prompt, round, `z-${zone.key}`)}
+    ${cuts.length ? `<p class="cuts">Deep space answers on our list: <b>${cuts.map(esc).join("</b>, <b>")}</b>.</p>` : ""}
     <div class="actions">
-      <button class="btn" data-action="next" id="next">${last ? "See results" : "Next prompt"}</button>
-      ${game.mode === "endless" && !last ? `<span class="hint lives" aria-label="${game.lives} lives left">${"●".repeat(game.lives)}<span class="lost">${"○".repeat(ENDLESS_LIVES - game.lives)}</span></span>` : ""}
+      <button class="btn" data-action="next" id="next"><span class="arrow">▶</span>${last ? "Flight log" : "Next prompt"}</button>
+      ${game.mode === "endless" ? ships(game.lives) : ""}
     </div>
   `);
   revealedAt = performance.now();
   document.getElementById("next").focus({ preventScroll: true });
+  animateFlight(round.points);
+}
+
+function animateFlight(points) {
+  const track = document.getElementById("track");
+  const pts = document.getElementById("pts");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (points > 0) sfx.launch(points); else sfx.miss();
+  if (reduce || points === 0) {
+    track.style.setProperty("--to", `${trackPercent(points)}%`);
+    pts.textContent = String(points);
+    return;
+  }
+  // two frames so the transition starts from zero
+  requestAnimationFrame(() => requestAnimationFrame(() => track.style.setProperty("--to", `${trackPercent(points)}%`)));
+  const start = performance.now();
+  const step = (now) => {
+    const t = Math.min(1, (now - start) / 1100);
+    pts.textContent = String(Math.round(points * (Math.floor(t * 22) / 22)));
+    if (t < 1 && document.body.contains(pts)) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
 function next() {
@@ -463,36 +545,37 @@ function renderResults(result) {
 
   const title = result.mode === "daily"
     ? `Daily No. ${dailyNumber(result.dateKey)}`
-    : result.mode === "pack" ? `${result.theme} pack` : `Endless · ${result.rounds.length} rounds`;
+    : result.mode === "pack" ? `Planet ${result.theme}` : `Endless · ${result.rounds.length} rounds`;
 
   const rows = result.rounds.map((r) => {
     const p = BY_ID.get(r.promptId);
     const ans = r.input ? r.display || r.input : "–";
     const mark = r.status === "judged" ? ' <span class="hint" title="Checked by Claude">*</span>' : "";
-    return `<tr>
-      <td><span class="q">${esc(p?.text ?? "")}</span><span class="a ${r.points ? "" : "miss"}">${esc(ans)}</span>${mark}</td>
+    const z = zoneFor(r.points);
+    return `<tr class="z-${z.key}">
+      <td><span class="q">${esc(p?.text ?? "")}</span><span class="a ${r.points ? "" : "miss"}">${esc(ans)}</span>${mark}<span class="z">${z.label}</span></td>
       <td class="p">${r.points}</td>
     </tr>`;
   }).join("");
   const anyJudged = result.rounds.some((r) => r.status === "judged");
 
   show(`
-    <p class="kicker">${esc(title)}</p>
+    <p class="kicker">Flight log · ${esc(title)}</p>
     <p class="total"><b>${sum}</b>${max ? `<span>/ ${max}</span>` : "<span>pts</span>"}</p>
     ${bars(scores)}
     <table class="ledger">
-      <thead><tr><th>Prompt and answer</th><th>Pts</th></tr></thead>
+      <thead><tr><th>Prompt and answer</th><th>Points</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    ${anyJudged ? `<p class="hint" style="margin:-16px 0 24px">* Not on our list. Checked by Claude.</p>` : ""}
+    ${anyJudged ? `<p class="hint" style="margin:-14px 0 24px">* Not on our list. Checked by Claude.</p>` : ""}
     <div class="actions">
       <button class="btn" data-action="share">Share score</button>
       ${result.mode === "daily"
         ? `<button class="btn secondary" data-action="endless">Play endless</button>`
         : `<button class="btn secondary" data-action="${result.mode === "pack" ? "pack" : "endless"}" data-theme="${esc(result.theme ?? "")}">Play again</button>`}
-      <button class="btn link" data-action="home">Home</button>
+      <button class="btn ghost" data-action="home">Home</button>
     </div>
-    ${result.mode === "daily" ? `<p class="sub" style="margin-top:20px">The next seven unlock in ${untilMidnight()}.</p>` : ""}
+    ${result.mode === "daily" ? `<p class="sub" style="margin-top:20px">Next launch window opens in ${untilMidnight()}.</p>` : ""}
   `);
   lastResult = result;
 }
@@ -509,6 +592,7 @@ async function share() {
     }
     await navigator.clipboard.writeText(text);
     toast("Copied to clipboard");
+    sfx.select();
   } catch (err) {
     if (err?.name !== "AbortError") toast("Couldn't copy. Select the score and copy it yourself.");
   }
@@ -527,7 +611,20 @@ document.addEventListener("click", (e) => {
   else if (action === "pass") submit("", "pass");
   else if (action === "next") next();
   else if (action === "share") share();
+  else if (action === "sound") toggleSound();
 });
+
+function syncSoundButton() {
+  const btn = document.getElementById("sound");
+  btn.setAttribute("aria-pressed", String(!isMuted()));
+  btn.textContent = isMuted() ? "SFX OFF" : "SFX ON";
+}
+
+function toggleSound() {
+  setMuted(!isMuted());
+  syncSoundButton();
+  sfx.select();
+}
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && game && document.getElementById("answer") && !submitting) {
@@ -535,6 +632,9 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-document.getElementById("dateline").textContent = `${formatDate()} · No. ${dailyNumber(today())}`;
+document.getElementById("dateline").textContent = `${formatDate().toUpperCase()}`;
+document.getElementById("logo").innerHTML = rocketSVG();
+syncSoundButton();
+startStarfield(document.getElementById("stars"));
 renderHome();
 checkJudge();

@@ -4,6 +4,12 @@ A daily trivia game where the rarest correct answer wins.
 
 You get a prompt such as *Name a fruit* and 20 seconds. "Apple" is right, but it's what everyone says, so it scores 5. "Jabuticaba" is also right, and almost nobody says it, so it scores close to 100.
 
+## Look and feel
+
+Deep space in 8-bit. Common answers barely leave orbit, and rare answers that are still right fly out to deep space. After each answer, a pixel rocket flies from Earth along a track split into four zones (low orbit, moon range, outer planets, deep space), and the score counts up as it goes. The timer is a fuel gauge that drains one cell per second. Each theme is its own planet, and Endless gives you three ships.
+
+All the art is original and drawn in code (`public/pixel.js`): the rocket and ship sprites, dithered planets generated from a seed, a drifting starfield, faint CRT scanlines, and square-wave sound effects through Web Audio (the rarer the answer, the higher the launch arpeggio climbs, and the SFX button mutes them). The fonts are Press Start 2P and VT323, bundled locally under the SIL Open Font License. With "reduce motion" turned on, the stars stay still and the rocket jumps straight to where it lands.
+
 ## Run it
 
 ```
@@ -66,7 +72,9 @@ apple=20|apples; dragon fruit=0.4|pitaya|pitahaya; jabuticaba
 
 ```
 public/index.html    page shell
-public/styles.css    design: paper and ink with one vermilion accent, light and dark
+public/styles.css    the 8-bit space design (pixel frames and buttons, fuel gauge, flight track)
+public/pixel.js      sprites, generated planets, starfield, sound effects
+public/fonts/        Press Start 2P and VT323 (OFL)
 public/app.js        screens, timer, storage, sharing
 public/engine.js     matching, scoring and daily selection (no DOM; shared with tests and server)
 public/prompts.js    the 30 prompts
