@@ -585,17 +585,35 @@ let lastResult = null;
 async function share() {
   if (!lastResult) return;
   const text = shareText(lastResult);
+  // Clipboard first, while we're still inside the click. Some embeds refuse it,
+  // so then try the share sheet, and finally show the text to select by hand.
   try {
-    if (navigator.share && matchMedia("(hover: none)").matches) {
-      await navigator.share({ text });
-      return;
-    }
     await navigator.clipboard.writeText(text);
     toast("Copied to clipboard");
     sfx.select();
+    return;
+  } catch { /* fall through */ }
+  try {
+    if (navigator.share) {
+      await navigator.share({ text });
+      return;
+    }
   } catch (err) {
-    if (err?.name !== "AbortError") toast("Couldn't copy. Select the score and copy it yourself.");
+    if (err?.name === "AbortError") return;
   }
+  let box = document.getElementById("share-text");
+  if (!box) {
+    box = document.createElement("textarea");
+    box.id = "share-text";
+    box.className = "frame share-text";
+    box.readOnly = true;
+    box.rows = 5;
+    box.setAttribute("aria-label", "Your score, ready to copy");
+    document.querySelector("#app .actions")?.after(box);
+  }
+  box.value = text;
+  box.select();
+  toast("Select the text below and copy it");
 }
 
 // ---------- wiring ----------
